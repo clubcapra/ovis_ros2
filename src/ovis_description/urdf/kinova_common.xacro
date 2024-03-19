@@ -25,10 +25,10 @@
             <visual>
                 <geometry>
                     <mesh
-                        filename="package://ovis_description/meshes/${link_mesh}.STL"/>
+                        filename="$(find ovis_description)/meshes/${link_mesh}.stl"/>
                 </geometry>
                 <material name="carbon_fiber">
-                    <color rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+                    <color rgba="0.792156862745098 0 0 1" />
                 </material>
             </visual>
 
@@ -37,7 +37,7 @@
 	           <visual>
                 <geometry>
                     <mesh
-                        filename="package://ovis_description/meshes/${ring_mesh}.STL"/>
+                        filename="$(find ovis_description)/meshes/${ring_mesh}.stl"/>
                 </geometry>
              </visual>
 	    </xacro:if>
@@ -45,7 +45,7 @@
             <collision>
                 <geometry>
                     <mesh
-                        filename="package://ovis_description/meshes/${link_mesh}.STL"/>
+                        filename="$(find ovis_description)/meshes/${link_mesh}.stl"/>
                 </geometry>
             </collision>
 						<xacro:kinova_inertial mesh_no="${mesh_no}"/>
