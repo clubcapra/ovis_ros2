@@ -22,7 +22,7 @@ def generate_launch_description():
     pkg_ros_gz_sim = get_package_share_directory('ros_gz_sim')
 
     # Get the URDF file
-    urdf_path = os.path.join(pkg_ovis_description, 'urdf', 'ovis.urdf.xacro')
+    urdf_path = os.path.join(pkg_ovis_description, 'urdf', 'ovis_standalone.urdf.xacro')
     robot_desc = ParameterValue(Command(['xacro ', urdf_path]), value_type=str)
     world_file_name = 'worlds/base_world.world'
     world = os.path.join(pkg_ovis_description, world_file_name)
