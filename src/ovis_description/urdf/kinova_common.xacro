@@ -25,7 +25,7 @@
             <visual>
                 <geometry>
                     <mesh
-                        filename="$(find ovis_description)/meshes/${link_mesh}.stl"/>
+                        filename="file://$(find ovis_description)/meshes/${link_mesh}.stl"/>
                 </geometry>
                 <material name="carbon_fiber">
                     <color rgba="0.792156862745098 0 0 1" />
