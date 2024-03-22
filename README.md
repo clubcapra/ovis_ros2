@@ -1,16 +1,15 @@
-# ovis-2
+# ovis-ros2
 
-Boot command:
-```bash
-colcon build --symlink-install && source install/setup.bash && ros2 launch ovis_description sim.launch.py
-```
-
+Launch gazebo command:
 ```bash
 colcon build --symlink-install
 source install/setup.bash
 ros2 launch ovis_description sim.launch.py
 ```
 
+Launch rviz command:
 ```bash
-ros2 launch ovis_description sim.launch.py
+colcon build --symlink-install
+source install/setup.bash
+ros2 launch ovis_description launch.py
 ```
