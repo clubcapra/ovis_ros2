@@ -7,7 +7,7 @@ from launch_ros.actions import Node
 
 
 def generate_launch_description():
-    urdf_file_name = 'urdf/ovis.urdf.xacro'
+    urdf_file_name = 'urdf/ovis_standalone.urdf.xacro'
     urdf = os.path.join(get_package_share_directory(
         'ovis_description'), urdf_file_name)
 
