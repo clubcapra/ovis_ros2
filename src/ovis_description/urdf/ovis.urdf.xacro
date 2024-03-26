@@ -39,7 +39,8 @@
     <xacro:property name="joint_base" value="joint_base" />
     <xacro:property name="joint_base_type" value="fixed" />
     <xacro:property name="joint_base_axis_xyz" value="0 0 0" />
-    <xacro:property name="joint_base_origin_xyz" value="0 0 0" />
+    <!-- Transferred to a parameter in the ovis macro -->
+    <!-- <xacro:property name="joint_base_origin_xyz" value="0 0 0" /> -->
     <xacro:property name="joint_base_origin_rpy" value="${J_PI/2} 0 0" />
 
 
@@ -112,7 +113,7 @@
     <xacro:property name="joint_end_effector_origin_rpy" value="${J_PI} 0 ${J_PI/2}" />
 
 
-    <xacro:macro name="ovis" params="base_parent prefix:=ovis">
+    <xacro:macro name="ovis" params="base_parent prefix:=ovis joint_base_origin_xyz:='0 0 0'">
 
         <xacro:gazebo_config robot_namespace="${prefix}" />
 
