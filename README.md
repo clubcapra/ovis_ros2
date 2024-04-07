@@ -27,7 +27,6 @@ sudo rosdep init
 rosdep update
 rosdep install -r --from-paths src -i -y --rosdistro humble
 
-
 sudo apt update
 sudo apt install ros-humble-moveit
 ```
