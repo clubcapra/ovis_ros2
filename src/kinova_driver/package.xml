@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>kinova_driver</name>
+  <version>0.0.1</version>
+  <description>
+          The ROS Kinova driver provides a ROS interface for the Kinova Robotics
+          robotic manipulator arms. This stack provides access to the Kinova
+          C++ hardware API through ROS.
+  </description>
+
+  <author email="ibaranov@clearpathrobotics.com">Ilia Baranov (Clearpath)</author>
+  <author email="jschmidt@clearpathrobotics.com">Jeff Schmidt (Clearpath)</author>
+  <author email="abencz@clearpathrobotics.com">Alex Bencz (Clearpath)</author>
+  <author>Matt DeDonato (WPI)</author>
+  <author email="braden@stenning.com">Braden Stenning</author>
+  <maintainer email="support@kinova.ca">Kinova Support</maintainer>
+  <license>BSD</license>
+
+  <url>http://wiki.ros.org/kinova_driver</url>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>action_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>kinova_msgs</depend>
+  <depend>rclcpp</depend>
+  <depend>rclpy</depend>
+  <depend>sensor_msgs</depend>
+  <depend>std_msgs</depend>
+  <depend>tf2</depend>
+  <depend>angles</depend>
+  <depend>interactive_markers</depend>
+  <depend>visualization_msgs</depend>
+  <depend>control_msgs</depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

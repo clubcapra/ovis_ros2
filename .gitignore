@@ -3,9 +3,10 @@ build/
 log/
 install/
 
-# Ignore everything in src except ovis_*
+# Ignore everything in src except ovis_* and kinova_*
 src/*
 !src/ovis_*
+!src/kinova_*
 
 # Ignore Python bytecodes
 __pycache__/
