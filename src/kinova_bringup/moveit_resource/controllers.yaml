@@ -1,23 +1,23 @@
 controller_names:
-  - j2n6s300
-  - j2n6s300_gripper
+  - ovis
+  - ovis_gripper
 
-j2n6s300:
+ovis:
   action_ns: follow_joint_trajectory
   type: FollowJointTrajectory
   default: true
   joints:
-    - j2n6s300_joint_1
-    - j2n6s300_joint_2
-    - j2n6s300_joint_3
-    - j2n6s300_joint_4
-    - j2n6s300_joint_5
-    - j2n6s300_joint_6
-j2n6s300_gripper:
+    - ovis_joint_1
+    - ovis_joint_2
+    - ovis_joint_3
+    - ovis_joint_4
+    - ovis_joint_5
+    - ovis_joint_6
+ovis_gripper:
   action_ns: gripper_command
   type: GripperCommand
   default: true    
   joints:
-    - j2n6s300_joint_finger_1
-    - j2n6s300_joint_finger_2
-    - j2n6s300_joint_finger_3
+    - ovis_joint_finger_1
+    - ovis_joint_finger_2
+    - ovis_joint_finger_3
