@@ -7,6 +7,7 @@ install/
 src/*
 !src/ovis_*
 !src/kinova_*
+!src/.kinova_*
 
 # Ignore Python bytecodes
 __pycache__/
