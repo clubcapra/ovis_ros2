@@ -61,7 +61,7 @@ def launch_setup(context, *args, **kwargs):
         condition=UnlessCondition(LaunchConfiguration("use_urdf")),
     )
     
-    xacro_file = os.path.join(get_package_share_directory('kinova_description'), 'urdf', robot_type + '_standalone.xacro')
+    xacro_file = os.path.join(get_package_share_directory('ovis_description'), 'urdf', 'ovis' + '_standalone.urdf.xacro')
     doc = xacro.process_file(xacro_file)
     robot_desc = doc.toprettyxml(indent='  ')
     robot_state_publisher = Node(

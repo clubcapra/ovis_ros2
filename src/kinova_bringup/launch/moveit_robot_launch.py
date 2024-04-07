@@ -42,7 +42,7 @@ def generate_launch_description():
     # Check if moveit is installed
     if 'moveit' in get_packages_with_prefixes():
         # Configuration
-        xacro_file = os.path.join(get_package_share_directory('kinova_description'), 'urdf', 'j2n6s300_standalone.xacro')
+        xacro_file = os.path.join(get_package_share_directory('ovis_description'), 'urdf', 'ovis_standalone.urdf.xacro')
         doc = xacro.process_file(xacro_file)
         description = {'robot_description': doc.toprettyxml(indent='  ')}
 
