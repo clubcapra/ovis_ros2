@@ -20,13 +20,13 @@
     <!-- Import all Gazebo-customization elements -->
     <xacro:include filename="$(find ovis_description)/urdf/ovis.gazebo" />
 
-    <xacro:property name="link_base_mesh" value="visual/ovis_base" />
-    <xacro:property name="link_1_mesh" value="visual/ovis_shoulder" />
-    <xacro:property name="link_2_mesh" value="visual/ovis_upper_arm" />
-    <xacro:property name="link_3_mesh" value="visual/ovis_elbow" />
-    <xacro:property name="link_4_mesh" value="visual/ovis_forearm" />
-    <xacro:property name="link_5_mesh" value="visual/ovis_wrist" />
-    <xacro:property name="link_6_mesh" value="visual/ovis_flange" />
+    <xacro:property name="link_base_mesh" value="ovis_base" />
+    <xacro:property name="link_1_mesh" value="ovis_shoulder" />
+    <xacro:property name="link_2_mesh" value="ovis_upper_arm" />
+    <xacro:property name="link_3_mesh" value="ovis_elbow" />
+    <xacro:property name="link_4_mesh" value="ovis_forearm" />
+    <xacro:property name="link_5_mesh" value="ovis_wrist" />
+    <xacro:property name="link_6_mesh" value="ovis_flange" />
 
     <xacro:property name="link_base_mesh_no" value="0" />
     <xacro:property name="link_1_mesh_no" value="1" />

@@ -1,1 +1,1 @@
-controller_joint_names: [j2n6s300_joint_1 j2n6s300_joint_2 j2n6s300_joint_3 j2n6s300_joint_4 j2n6s300_joint_5 j2n6s300_joint_6]
+controller_joint_names: [ovis_joint_1 ovis_joint_2 ovis_joint_3 ovis_joint_4 ovis_joint_5 ovis_joint_6]

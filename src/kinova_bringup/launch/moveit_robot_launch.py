@@ -46,7 +46,7 @@ def generate_launch_description():
         doc = xacro.process_file(xacro_file)
         description = {'robot_description': doc.toprettyxml(indent='  ')}
 
-        description_semantic = {'robot_description_semantic': load_file('j2n6s300.srdf')}
+        description_semantic = {'robot_description_semantic': load_file('ovis.srdf')}
         description_kinematics = {'robot_description_kinematics': load_yaml('kinematics.yaml')}
         description_joint_limits = {'robot_description_planning': load_yaml('joint_limits.yaml')}
         sim_time = {'use_sim_time': False}
@@ -101,7 +101,7 @@ def generate_launch_description():
                     description_joint_limits,
                     sim_time
                 ],
-                remappings=[('/joint_states', '/j2n6s300_driver/out/joint_state')],
+                remappings=[('/joint_states', '/ovis_driver/out/joint_state')],
             )
         )
     else:
