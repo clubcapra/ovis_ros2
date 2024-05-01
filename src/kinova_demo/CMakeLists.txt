@@ -62,9 +62,11 @@ find_package(rclpy REQUIRED)
 
 # Install Python modules
 ament_python_install_package(${PROJECT_NAME})
+ament_python_install_package(ros2_nodes)
 # Install Python executables
 install(PROGRAMS
   ros2_nodes/pose_action_client.py
+  ros2_nodes/joints_action_client.py
   DESTINATION lib/${PROJECT_NAME}
 )
 

@@ -52,7 +52,9 @@ def generate_launch_description():
         sim_time = {'use_sim_time': False}
 
         # Rviz node
-        rviz_config_file = os.path.join(package_dir, 'moveit_resource', 'visualization.rviz')
+        pkg_ovis_description = get_package_share_directory('ovis_description')
+
+        rviz_config_file = os.path.join(pkg_ovis_description, 'config', 'moveit.rviz')
 
         launch_description_nodes.append(
             Node(

@@ -65,7 +65,8 @@ def generate_launch_description():
        package='rviz2',
        executable='rviz2',
        arguments=['-d', os.path.join(pkg_ovis_description, 'config',
-                                     'basic.rviz')],
+                                     #'basic.rviz')],
+                                     'moveit.rviz')],
     )
 
     # Bridge ROS topics and Gazebo messages for establishing communication
