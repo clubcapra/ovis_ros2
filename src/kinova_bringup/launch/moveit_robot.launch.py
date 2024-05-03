@@ -49,7 +49,7 @@ def generate_launch_description():
         description_semantic = {'robot_description_semantic': load_file('ovis.srdf')}
         description_kinematics = {'robot_description_kinematics': load_yaml('kinematics.yaml')}
         description_joint_limits = {'robot_description_planning': load_yaml('joint_limits.yaml')}
-        sim_time = {'use_sim_time': False}
+        sim_time = {'use_sim_time': True}
 
         # Rviz node
         pkg_ovis_description = get_package_share_directory('ovis_description')

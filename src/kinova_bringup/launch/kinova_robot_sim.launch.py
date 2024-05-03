@@ -1,13 +1,22 @@
 import os
-from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch_ros.actions import Node
-from launch.actions import DeclareLaunchArgument, OpaqueFunction, IncludeLaunchDescription
+import pathlib
+import yaml
+
+from launch.actions import (
+    DeclareLaunchArgument,
+    IncludeLaunchDescription,
+    OpaqueFunction,
+    RegisterEventHandler,
+)
 from launch.conditions import IfCondition, UnlessCondition
 from launch.substitutions import LaunchConfiguration
 from launch_ros.parameter_descriptions import ParameterValue
 from launch.substitutions import Command
 from launch.launch_description_sources import PythonLaunchDescriptionSource
+from launch.event_handlers import OnProcessExit
+from ament_index_python.packages import get_package_share_directory, get_packages_with_prefixes
 
 import xacro
 import yaml
@@ -21,10 +30,18 @@ configurable_parameters = [
     {'name': 'feedback_publish_rate', 'default': "0.1"},
     {'name': 'tolerance',             'default': "2.0"},
 ]
+PACKAGE_NAME = 'kinova_bringup'
+
 
 def generate_launch_description():
     # Configure ROS nodes for launch
+    package_dir = get_package_share_directory(PACKAGE_NAME)
+    def load_file(filename):
+        return pathlib.Path(os.path.join(package_dir, 'moveit_resource', filename)).read_text()
 
+    def load_yaml(filename):
+        return yaml.safe_load(load_file(filename))
+    
     # Get the launch directory
     pkg_ovis_description = get_package_share_directory('ovis_description')
     pkg_ros_gz_sim = get_package_share_directory('ros_gz_sim')
@@ -33,6 +50,14 @@ def generate_launch_description():
     robot_desc = ParameterValue(Command(['xacro ', urdf_path]), value_type=str)
     world_file_name = 'worlds/base_world.world'
     world = os.path.join(pkg_ovis_description, world_file_name)
+    xacro_file = os.path.join(get_package_share_directory('ovis_description'), 'urdf', 'ovis_standalone.urdf.xacro')
+    doc = xacro.process_file(xacro_file)
+    description = {'robot_description': doc.toprettyxml(indent='  ')}
+
+    description_semantic = {'robot_description_semantic': load_file('ovis.srdf')}
+    description_kinematics = {'robot_description_kinematics': load_yaml('kinematics.yaml')}
+    description_joint_limits = {'robot_description_planning': load_yaml('joint_limits.yaml')}
+    sim_time = {'use_sim_time': True}
 
     # Setup to launch the simulator and Gazebo world
     gz_sim = IncludeLaunchDescription(
@@ -54,16 +79,24 @@ def generate_launch_description():
         output='screen',
     )
 
-    # Takes the description and joint angles as inputs and publishes
-    # the 3D poses of the robot links
-    robot_state_publisher = Node(
-        package='robot_state_publisher',
-        executable='robot_state_publisher',
-        name='robot_state_publisher',
-        output='both',
-        parameters=[
-            {"use_sim_time": True}
-        ]
+
+    ros2_controllers_path = os.path.join(
+        get_package_share_directory("kinova_bringup"),
+        "moveit_resource",
+        "controllers_ros_control.yaml",
+    )
+    ros2_control_node = Node(
+        package="controller_manager",
+        executable="ros2_control_node",
+        parameters=[ros2_controllers_path],
+        output="both",
+    )
+    joint_state_controller = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=[
+            "joint_state_controller",
+        ],
     )
 
     # Visualize in RViz
@@ -71,8 +104,17 @@ def generate_launch_description():
        package='rviz2',
        executable='rviz2',
        arguments=['-d', os.path.join(pkg_ovis_description, 'config', 'moveit.rviz')],
-       condition=IfCondition(LaunchConfiguration("rviz")),
+       parameters=[
+                    description,
+                    description_semantic,
+                    description_kinematics,
+                    description_joint_limits,
+                    sim_time
+                ],
     )
+
+
+    
 
     # Bridge ROS topics and Gazebo messages for establishing communication
     bridge = Node(
@@ -95,9 +137,11 @@ def generate_launch_description():
             DeclareLaunchArgument('rviz', default_value='true', description='Open RViz.'),
             bridge,
             #robot_state_publisher,
-            rviz,
+            #rviz,
             create,
             kinova_nodes,
+            joint_state_controller,
+            ros2_control_node,
             ])
 
 def launch_setup(context):
@@ -130,7 +174,7 @@ def launch_setup(context):
         executable='robot_state_publisher',
         remappings=[('joint_states', robot_type+'_driver/out/joint_state')],
         output='screen',
-        parameters=[{'robot_description': robot_desc},],
+        parameters=[{'robot_description': robot_desc},{"use_sim_time": True}],
         condition=IfCondition(LaunchConfiguration("use_urdf")),
     )
     return [kinova_tf_updater,robot_state_publisher,kinova_interactive_control]
