@@ -1,8 +1,35 @@
-controller_list:
-  - name: ovis/effort_joint_trajectory_controller
-    action_ns: follow_joint_trajectory
-    type: FollowJointTrajectory
-    default: true
+# controller_list:
+#   - name: ovis/effort_joint_trajectory_controller
+#     action_ns: follow_joint_trajectory
+#     type: FollowJointTrajectory
+#     default: true
+#     joints:
+#       - ovis_joint_1
+#       - ovis_joint_2
+#       - ovis_joint_3
+#       - ovis_joint_4
+#       - ovis_joint_5
+#       - ovis_joint_6
+#   - name: ovis/effort_finger_trajectory_controller
+#     action_ns: follow_joint_trajectory
+#     type: FollowJointTrajectory
+#     default: true    
+#     joints:
+#       - ovis_joint_finger_1
+#       - ovis_joint_finger_2
+#       - ovis_joint_finger_3
+# controller_manager provides the necessary infrastructure to manage multiple controllers efficiently and robustly.
+controller_manager:
+  ros__parameters:
+    update_rate: 10 
+    arm_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+    grip_controller:
+      type: joint_trajectory_controller/JointTrajectoryController
+    joint_state_broadcaster:
+      type: joint_state_broadcaster/JointStateBroadcaster
+effort_joint_trajectory_controller:
+  ros__parameters:
     joints:
       - ovis_joint_1
       - ovis_joint_2
@@ -10,11 +37,18 @@ controller_list:
       - ovis_joint_4
       - ovis_joint_5
       - ovis_joint_6
-  - name: ovis/effort_finger_trajectory_controller
-    action_ns: follow_joint_trajectory
-    type: FollowJointTrajectory
-    default: true    
+    command_interfaces:
+      - position
+    state_interfaces:
+      - position
+    allow_integration_in_goal_trajectories: true
+effort_finger_trajectory_controller:
+  ros__parameters:
     joints:
-      - ovis_joint_finger_1
-      - ovis_joint_finger_2
-      - ovis_joint_finger_3
+      - ovis_joint_end_effector
+    command_interfaces:
+      - position
+    state_interfaces:
+      - position
+    open_loop_control: true
+    allow_integration_in_goal_trajectories: true
