@@ -18,7 +18,9 @@
     <!-- <xacro:include filename="$(find ovis_description)/urdf/kinova_finger_set.xacro" /> -->
 
     <!-- Import all Gazebo-customization elements -->
-    <xacro:include filename="$(find ovis_description)/urdf/ovis.gazebo" />
+    <!-- <xacro:include filename="$(find ovis_description)/urdf/ovis.gazebo" /> -->
+
+    <xacro:include filename="$(find ovis_description)/urdf/ovis.ros2_control.xacro"/>
 
     <xacro:property name="link_base_mesh" value="ovis_base" />
     <xacro:property name="link_1_mesh" value="ovis_shoulder" />
@@ -115,7 +117,9 @@
 
     <xacro:macro name="ovis" params="base_parent prefix:=ovis joint_base_origin_xyz:='0 0 0'">
 
-        <xacro:gazebo_config robot_namespace="${prefix}" />
+        
+
+        <!-- <xacro:gazebo_config robot_namespace="${prefix}" /> -->
 
         <xacro:kinova_armlink link_name="${prefix}_link_base" link_mesh="${link_base_mesh}"
             mesh_no="${link_base_mesh_no}" />
@@ -190,6 +194,8 @@
             joint_upper_limit="0" />
 
         <!-- <xacro:kinova_3fingers link_hand="${prefix}_link_6" prefix="${prefix}_"/> -->
+
+        <!-- <xacro:ovis_ros2_control name="ovis" prefix="${prefix}" /> -->
     </xacro:macro>
 
 </root>

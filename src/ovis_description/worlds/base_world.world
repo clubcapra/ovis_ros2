@@ -27,8 +27,8 @@
         <plugin name='gz::sim::systems::Contact' filename='gz-sim-contact-system'/>
         <!-- FT Plugin -->
         <plugin
-        filename="ignition-gazebo-forcetorque-system"
-        name="ignition::gazebo::systems::ForceTorque">
+        filename="gz-sim-forcetorque-system"
+        name="gz::sim::systems::ForceTorque">
         </plugin>
 
         <light type="directional" name="sun">
