@@ -16,9 +16,6 @@ def generate_launch_description():
 
     # Get the launch directory
     pkg_ovis_description = get_package_share_directory('ovis_description')
-    # pkg_ovis_slam = get_package_share_directory('ovis_slam')
-    # pkg_ovis_nav = get_package_share_directory('ovis_navigation')
-    # slam_pkg_path = get_package_share_directory("slam_toolbox")
     pkg_ros_gz_sim = get_package_share_directory('ros_gz_sim')
 
     # Get the URDF file
@@ -81,42 +78,10 @@ def generate_launch_description():
         output='screen'
     )
 
-    # slam = IncludeLaunchDescription(
-    #     PythonLaunchDescriptionSource(
-    #         os.path.join(slam_pkg_path, "launch", "online_async_launch.py"),
-    #     ),
-    #     launch_arguments={
-    #         "use_sim_time": "true",
-    #         "slam_params_file": os.path.join(
-    #             pkg_ovis_slam, "config", "slam_config.yaml"
-    #         )
-    #     }.items(),
-    # )
-
-    # nav = IncludeLaunchDescription(
-    #     PythonLaunchDescriptionSource(
-    #         os.path.join(pkg_ovis_nav, "navigation.launch.py"),
-    #     )
-    # )
-
-    # robot_localization_node = Node(
-    #    package='robot_localization',
-    #    executable='ekf_node',
-    #    name='ekf_filter_node',
-    #    output='screen',
-    #    parameters=[os.path.join(pkg_ovis_slam, 'config/ekf.yaml'),
-    #                {'use_sim_time': True}]
-    #                )
-
     return LaunchDescription([
             gz_sim,
-            DeclareLaunchArgument('rviz', default_value='true',
-                                  description='Open RViz.'),
             bridge,
             robot_state_publisher,
-            # robot_localization_node,
             rviz,
-            # slam,
             create,
-            # nav,
             ])

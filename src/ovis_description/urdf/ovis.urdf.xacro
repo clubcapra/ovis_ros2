@@ -18,7 +18,7 @@
     <!-- <xacro:include filename="$(find ovis_description)/urdf/kinova_finger_set.xacro" /> -->
 
     <!-- Import all Gazebo-customization elements -->
-    <xacro:include filename="$(find ovis_description)/urdf/ovis.gazebo" />
+    <xacro:include filename="$(find ovis_description)/urdf/gazebo.urdf.xacro" />
 
     <xacro:property name="link_base_mesh" value="visual/ovis_base" />
     <xacro:property name="link_1_mesh" value="visual/ovis_shoulder" />
