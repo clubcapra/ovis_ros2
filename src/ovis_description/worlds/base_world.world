@@ -1,13 +1,6 @@
 <?xml version="1.0" ?>
 <sdf version="1.6">
     <world name="default">
-        <!--
-            A demo world for tracked vehicles to do frontier searching and path planning.
-
-            Drive the vehicle by keyboard using arrows, or by publishing the
-            desired velocity to ~/<vehicle name>/cmd_vel
-            (x and yaw command the motion).
-        -->
         <gui fullscreen='0'>
             <camera name='user_camera'>
                 <pose>2 18 15 0 0.75 -1.7</pose>

@@ -1,24 +1,6 @@
 <?xml version="1.0"?>
-<root xmlns:xi="http://www.w3.org/2001/XInclude"
-    xmlns:gazebo="http://playerstage.sourceforge.net/gazebo/xmlschema/#gz"
-    xmlns:model="http://playerstage.sourceforge.net/gazebo/xmlschema/#model"
-    xmlns:sensor="http://playerstage.sourceforge.net/gazebo/xmlschema/#sensor"
-    xmlns:body="http://playerstage.sourceforge.net/gazebo/xmlschema/#body"
-    xmlns:geom="http://playerstage.sourceforge.net/gazebo/xmlschema/#geom"
-    xmlns:joint="http://playerstage.sourceforge.net/gazebo/xmlschema/#joint"
-    xmlns:controller="http://playerstage.sourceforge.net/gazebo/xmlschema/#controller"
-    xmlns:interface="http://playerstage.sourceforge.net/gazebo/xmlschema/#interface"
-    xmlns:rendering="http://playerstage.sourceforge.net/gazebo/xmlschema/#rendering"
-    xmlns:renderable="http://playerstage.sourceforge.net/gazebo/xmlschema/#renderable"
-    xmlns:physics="http://playerstage.sourceforge.net/gazebo/xmlschema/#physics"
-    xmlns:xacro="http://www.ros.org/wiki/xacro">
+<root xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-
-    <xacro:include filename="$(find ovis_description)/urdf/kinova_common.xacro" />
-    <!-- <xacro:include filename="$(find ovis_description)/urdf/kinova_finger_set.xacro" /> -->
-
-    <!-- Import all Gazebo-customization elements -->
-    <xacro:include filename="$(find ovis_description)/urdf/gazebo.urdf.xacro" />
 
     <xacro:property name="link_base_mesh" value="visual/ovis_base" />
     <xacro:property name="link_1_mesh" value="visual/ovis_shoulder" />
@@ -189,7 +171,6 @@
             joint_origin_rpy="${joint_end_effector_origin_rpy}" joint_lower_limit="0"
             joint_upper_limit="0" />
 
-        <!-- <xacro:kinova_3fingers link_hand="${prefix}_link_6" prefix="${prefix}_"/> -->
     </xacro:macro>
 
 </root>

@@ -15,12 +15,11 @@ def generate_launch_description():
     # Configure ROS nodes for launch
 
     # Get the launch directory
+    pkg_ovis_bringup = get_package_share_directory('ovis_bringup')
     pkg_ovis_description = get_package_share_directory('ovis_description')
     pkg_ros_gz_sim = get_package_share_directory('ros_gz_sim')
 
     # Get the URDF file
-    urdf_path = os.path.join(pkg_ovis_description, 'urdf', 'ovis_standalone.urdf.xacro')
-    robot_desc = ParameterValue(Command(['xacro ', urdf_path]), value_type=str)
     world_file_name = 'worlds/base_world.world'
     world = os.path.join(pkg_ovis_description, world_file_name)
 
@@ -44,27 +43,6 @@ def generate_launch_description():
         output='screen',
     )
 
-    # Takes the description and joint angles as inputs and publishes
-    # the 3D poses of the robot links
-    robot_state_publisher = Node(
-        package='robot_state_publisher',
-        executable='robot_state_publisher',
-        name='robot_state_publisher',
-        output='both',
-        parameters=[
-            {'robot_description': robot_desc},
-            {"use_sim_time": True, }
-        ]
-    )
-
-    # Visualize in RViz
-    rviz = Node(
-       package='rviz2',
-       executable='rviz2',
-       arguments=['-d', os.path.join(pkg_ovis_description, 'config',
-                                     'basic.rviz')],
-    )
-
     # Bridge ROS topics and Gazebo messages for establishing communication
     bridge = Node(
         package='ros_gz_bridge',
@@ -78,10 +56,16 @@ def generate_launch_description():
         output='screen'
     )
 
+    # Include common launch configuration
+    common = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(pkg_ovis_bringup, "launch", "common.launch.py"),
+        ),
+    )
+
     return LaunchDescription([
             gz_sim,
             bridge,
-            robot_state_publisher,
-            rviz,
             create,
+            common,
             ])
