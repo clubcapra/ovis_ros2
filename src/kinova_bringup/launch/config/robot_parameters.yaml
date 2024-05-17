@@ -10,13 +10,13 @@
 # payload: [COM COMx COMy COMz]
 #payload: [0, 0, 0, 0]
 
-connection_type: USB # Ethernet or USB
+connection_type: Ethernet # Ethernet or USB
 
 # Ethernet connection parameters
 # ethernet:
-local_machine_IP: 192.168.100.100
+local_machine_IP: 192.168.84.15
 subnet_mask: 255.255.255.0
-local_cmd_port: 25000
+local_cmd_port: 25015
 local_broadcast_port: 25025
 
 #Torque control parameters

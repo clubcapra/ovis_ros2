@@ -1,0 +1,6 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<library path="ovis_arm_moveit_ikfast_plugin">
+  <class name="ovis_arm/IKFastKinematicsPlugin" type="ovis_arm::IKFastKinematicsPlugin" base_class_type="kinematics::KinematicsBase">
+    <description>IKFast61 plugin for closed-form kinematics of ovis arm</description>
+  </class>
+</library>

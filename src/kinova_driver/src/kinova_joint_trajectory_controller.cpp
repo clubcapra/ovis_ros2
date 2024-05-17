@@ -1,6 +1,5 @@
 #include <kinova_driver/kinova_joint_trajectory_controller.h>
 #include <angles/angles.h>
-// #include <ros/console.h>
 
 using namespace kinova;
 
@@ -8,10 +7,15 @@ JointTrajectoryController::JointTrajectoryController(kinova::KinovaComm &kinova_
     kinova_comm_(kinova_comm),
     nh_(n)
 {
-    //RCLCPP_DEBUG_STREAM_ONCE(nh_->get_logger(), "Get in: " << __PRETTY_FUNCTION__);
+    RCLCPP_DEBUG_STREAM_ONCE(nh_->get_logger(), "Get in: " << __PRETTY_FUNCTION__);
 
-    prefix_ = "j2n6s300";
-    robot_type = "j2n6s300";
+    // MODIF
+    // prefix_ = "j2n6s300";
+    // robot_type = "j2n6s300";
+    // prefix_ = "c2n6s200";
+    // robot_type = "c2n6s200";
+    prefix_ = "ovis";
+    robot_type = "c2n6s200";
     
     if (!nh_->has_parameter("robot_name"))
         nh_->declare_parameter("robot_name", prefix_);
@@ -23,11 +27,8 @@ JointTrajectoryController::JointTrajectoryController(kinova::KinovaComm &kinova_
     std::string pubsub_prefix = robot_type + "_driver/";
 
     number_joint_ =robot_type[3] - '0';
-
-    // // Display debug information in teminal
-    // if( ros::console::set_logger_level(ROSCONSOLE_DEFAULT_NAME, ros::console::levels::Debug) ) {
-    //     ros::console::notifyLoggerLevelsChanged();
-    // }
+    // Display debug information in teminal
+    nh_->get_logger().set_level(rclcpp::Logger::Level::Debug);
 
     sub_command_ = nh_->create_subscription<trajectory_msgs::msg::JointTrajectory>(pubsub_prefix+"trajectory_controller/command", 1,
         std::bind(&JointTrajectoryController::commandCB, this, std::placeholders::_1));
@@ -35,13 +36,16 @@ JointTrajectoryController::JointTrajectoryController(kinova::KinovaComm &kinova_
     pub_joint_feedback_ = nh_->create_publisher<control_msgs::action::FollowJointTrajectory_Feedback>(pubsub_prefix+"trajectory_controller/state", 1);
     pub_joint_velocity_ = nh_->create_publisher<kinova_msgs::msg::JointVelocity>(pubsub_prefix+"in/joint_velocity", 1);
 
-    traj_frame_id_ = "root";   
+    // MODIF
+    // traj_frame_id_ = "root";
+    traj_frame_id_ = "ovis_link_base";
     joint_names_.resize(number_joint_);
-    //std::cout << "joint names in feedback of trajectory state are: " << std::endl;
+    // std::cout << "joint names in feedback of trajectory state are: " << std::endl;
+    RCLCPP_DEBUG_STREAM_ONCE(nh_->get_logger(), "joint names in feedback of trajectory state are: ");
     for (uint i = 0; i<joint_names_.size(); i++)
     {
         joint_names_[i] = prefix_ + "_joint_" + std::to_string(i+1);
-        std::cout << joint_names_[i] << " ";
+        RCLCPP_DEBUG_STREAM(nh_->get_logger(), joint_names_[i] << " ");
     }
     std::cout << std::endl;
 
@@ -65,12 +69,12 @@ JointTrajectoryController::JointTrajectoryController(kinova::KinovaComm &kinova_
     traj_command_points_index_ = 0;
 
     for(int i=0; i<num_possible_joints; i++) current_velocity_command[i] = 0;
-    //RCLCPP_DEBUG_STREAM_ONCE(nh_->get_logger(), "Get out: " << __PRETTY_FUNCTION__);
+    RCLCPP_DEBUG_STREAM_ONCE(nh_->get_logger(), "Get out: " << __PRETTY_FUNCTION__);
 }
 
 JointTrajectoryController::~JointTrajectoryController()
 {
-    //RCLCPP_DEBUG_STREAM_ONCE(nh_->get_logger(), "Get in: " << __PRETTY_FUNCTION__);
+    RCLCPP_DEBUG_STREAM_ONCE(nh_->get_logger(), "Get in: " << __PRETTY_FUNCTION__);
     RCLCPP_WARN(nh_->get_logger(), "destruction entered!");
     {
         boost::mutex::scoped_lock terminate_lock(terminate_thread_mutex_);
@@ -85,14 +89,14 @@ JointTrajectoryController::~JointTrajectoryController()
     timer_pub_joint_vel_.reset();
     thread_update_state_->join();
 
-    //RCLCPP_DEBUG_STREAM_ONCE(nh_->get_logger(), "Get out: " << __PRETTY_FUNCTION__);
+    RCLCPP_DEBUG_STREAM_ONCE(nh_->get_logger(), "Get out: " << __PRETTY_FUNCTION__);
 }
 
 
 
 void JointTrajectoryController::commandCB(const trajectory_msgs::msg::JointTrajectory::SharedPtr traj_msg)
 {
-    //RCLCPP_DEBUG_STREAM_ONCE(nh_->get_logger(), "Get in: " << __PRETTY_FUNCTION__);
+    RCLCPP_DEBUG_STREAM_ONCE(nh_->get_logger(), "Get in: " << __PRETTY_FUNCTION__);
 
     bool command_abort = false;
 
@@ -188,20 +192,20 @@ void JointTrajectoryController::commandCB(const trajectory_msgs::msg::JointTraje
     double trajectory_duration = traj_command_points_[0].time_from_start.sec + traj_command_points_[0].time_from_start.nanosec / 1000000000;
 
     durations[0] = trajectory_duration;
-//    RCLCPP_DEBUG_STREAM(nh_->get_logger(), "durationsn 0 is: " << durations[0]);
+   RCLCPP_DEBUG_STREAM(nh_->get_logger(), "durationsn 0 is: " << durations[0]);
 
     for (int i = 1; i<traj_command_points_.size(); i++)
     {
         durations[i] = (traj_command_points_[i].time_from_start.sec + traj_command_points_[i].time_from_start.nanosec / 1000000000) - (traj_command_points_[i-1].time_from_start.sec + traj_command_points_[i-1].time_from_start.nanosec / 1000000000);
         trajectory_duration += durations[i];
-//        RCLCPP_DEBUG_STREAM(nh_->get_logger(), "durations " << i << " is: " << durations[i]);
+       RCLCPP_DEBUG_STREAM(nh_->get_logger(), "durations " << i << " is: " << durations[i]);
     }
 
     // start timer thread to publish joint velocity command
     time_pub_joint_vel_ = nh_->get_clock()->now();
     flag_timer_pub_joint_vel_ = true;
 
-    //RCLCPP_DEBUG_STREAM_ONCE(nh_->get_logger(), "Get out: " << __PRETTY_FUNCTION__);
+    RCLCPP_DEBUG_STREAM_ONCE(nh_->get_logger(), "Get out: " << __PRETTY_FUNCTION__);
 }
 
 
@@ -236,12 +240,12 @@ void JointTrajectoryController::pub_joint_vel()
         joint_velocity_msg.joint7 = kinova_angle_command_[traj_command_points_index_].Actuator7;
 
         // In debug: compare values with topic: follow_joint_trajectory/goal, command
-//        RCLCPP_DEBUG_STREAM_ONCE(nh_->get_logger(),  std::endl <<" joint_velocity_msg.joint1: " << joint_velocity_msg.joint1 * M_PI/180 <<
-//                          std::endl <<" joint_velocity_msg.joint2: " << joint_velocity_msg.joint2 * M_PI/180 <<
-//                          std::endl <<" joint_velocity_msg.joint3: " << joint_velocity_msg.joint3 * M_PI/180 <<
-//                          std::endl <<" joint_velocity_msg.joint4: " << joint_velocity_msg.joint4 * M_PI/180 <<
-//                          std::endl <<" joint_velocity_msg.joint5: " << joint_velocity_msg.joint5 * M_PI/180 <<
-//                          std::endl <<" joint_velocity_msg.joint6: " << joint_velocity_msg.joint6 * M_PI/180 );
+       RCLCPP_DEBUG_STREAM_ONCE(nh_->get_logger(),  std::endl <<" joint_velocity_msg.joint1: " << joint_velocity_msg.joint1 * M_PI/180 <<
+                         std::endl <<" joint_velocity_msg.joint2: " << joint_velocity_msg.joint2 * M_PI/180 <<
+                         std::endl <<" joint_velocity_msg.joint3: " << joint_velocity_msg.joint3 * M_PI/180 <<
+                         std::endl <<" joint_velocity_msg.joint4: " << joint_velocity_msg.joint4 * M_PI/180 <<
+                         std::endl <<" joint_velocity_msg.joint5: " << joint_velocity_msg.joint5 * M_PI/180 <<
+                         std::endl <<" joint_velocity_msg.joint6: " << joint_velocity_msg.joint6 * M_PI/180 );
 
         pub_joint_velocity_->publish(joint_velocity_msg);
 
@@ -284,7 +288,7 @@ void JointTrajectoryController::pub_joint_vel()
 
 void JointTrajectoryController::update_state()
 {
-    // RCLCPP_DEBUG_STREAM_ONCE(nh_->get_logger(), "Get in: " << __PRETTY_FUNCTION__);
+    RCLCPP_DEBUG_STREAM_ONCE(nh_->get_logger(), "Get in: " << __PRETTY_FUNCTION__);
 
     previous_pub_ = nh_->get_clock()->now();
     while (rclcpp::ok())
@@ -355,5 +359,5 @@ void JointTrajectoryController::update_state()
         previous_pub_ = nh_->get_clock()->now();
         rclcpp::Rate(10).sleep();
     }
-    //RCLCPP_DEBUG_STREAM_ONCE(nh_->get_logger(), "Get out: " << __PRETTY_FUNCTION__);
+    RCLCPP_DEBUG_STREAM_ONCE(nh_->get_logger(), "Get out: " << __PRETTY_FUNCTION__);
 }

@@ -34,7 +34,8 @@ def generate_launch_description():
     package_dir = get_package_share_directory(PACKAGE_NAME)
 
     def load_file(filename):
-        return pathlib.Path(os.path.join(package_dir, 'moveit_resource', filename)).read_text()
+        # return pathlib.Path(os.path.join(package_dir, 'moveit_resource', filename)).read_text()
+        return pathlib.Path(get_package_share_directory('ovis_moveit_config'), 'config', filename).read_text()
 
     def load_yaml(filename):
         return yaml.safe_load(load_file(filename))
@@ -81,8 +82,8 @@ def generate_launch_description():
             }
         }
         # MoveIt2 node
-        ompl_planning_yaml = load_yaml('ompl_planning.yaml')
-        ompl_planning_pipeline_config["move_group"].update(ompl_planning_yaml)
+        # ompl_planning_yaml = load_yaml('ompl_planning.yaml')
+        # ompl_planning_pipeline_config["move_group"].update(ompl_planning_yaml)
 
         moveit_controllers = {
             'moveit_controller_manager': 'moveit_simple_controller_manager/MoveItSimpleControllerManager',
@@ -99,7 +100,7 @@ def generate_launch_description():
                     description_semantic,
                     description_kinematics,
                     moveit_controllers,
-                    ompl_planning_pipeline_config,
+                    # ompl_planning_pipeline_config,
                     description_joint_limits,
                     sim_time
                 ],

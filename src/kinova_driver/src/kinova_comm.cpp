@@ -78,6 +78,7 @@ KinovaComm::KinovaComm(const std::shared_ptr<rclcpp::Node> node_handle,
     EthernetCommConfig ethernet_settings;
     std::string local_IP,subnet_mask;
     int local_cmd_port,local_bcast_port;
+    const char* robot_ip = "192.168.84.160";
     if (!node_handle->has_parameter("local_machine_IP"))
         node_handle->declare_parameter("local_machine_IP", local_IP);
     if (!node_handle->has_parameter("subnet_mask"))
@@ -96,7 +97,7 @@ KinovaComm::KinovaComm(const std::shared_ptr<rclcpp::Node> node_handle,
     ethernet_settings.localIpAddress = inet_addr(local_IP.c_str());
     ethernet_settings.subnetMask = inet_addr(subnet_mask.c_str());
     ethernet_settings.rxTimeOutInMs = 1000;
-    ethernet_settings.robotIpAddress = inet_addr("192.168.100.11");
+    ethernet_settings.robotIpAddress = inet_addr(robot_ip);
     ethernet_settings.robotPort = 55000;
 
     // Get the serial number parameter for the arm we wish to connect to
@@ -116,7 +117,20 @@ KinovaComm::KinovaComm(const std::shared_ptr<rclcpp::Node> node_handle,
                     << " API (header version: " << COMMAND_LAYER_VERSION
                     << ", library version: " << api_version[0] << "."
                                              << api_version[1] << "." << api_version[2] << ")");
-
+    RCLCPP_INFO_STREAM(rclcpp::get_logger("kinova_comm"), "Parameters:" <<
+        "\nlocal_machine_IP = " << local_IP <<
+        "\nsubnet_mask = " << subnet_mask <<
+        "\nlocal_cmd_port = " << local_cmd_port <<
+        "\nlocal_broadcast_port = " << local_bcast_port <<
+        "\nlocal_machine_IP = " << local_IP <<
+        "\nsubnet_mask = " << subnet_mask <<
+        "\nlocal_cmd_port = " << local_cmd_port <<
+        "\nlocal_broadcast_port = " << local_bcast_port <<
+        "\nrxTimeOutInMs = " << 1000 <<
+        "\nrobotIpAddress = " << robot_ip <<
+        "\nrobotPort = " << 55000 <<
+        "\nrobot_type = " << kinova_robotType
+        );
     if (api_type == "USB"){
       result = kinova_api_.initAPI();
     }
