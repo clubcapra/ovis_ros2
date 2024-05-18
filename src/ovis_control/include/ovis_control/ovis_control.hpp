@@ -26,6 +26,10 @@
 #include "rclcpp/macros.hpp"
 #include "rclcpp_lifecycle/state.hpp"
 
+// Kinova includes
+#include "kinova_driver/kinova_api.h"
+
+
 namespace ovis_control
 {
 class OvisHWInterface : public hardware_interface::SystemInterface
@@ -64,6 +68,7 @@ public:
 private:
   std::vector<double> hw_commands_;
   std::vector<double> hw_states_;
+  kinova::KinovaAPI mAPI{};
 };
 
 }  // namespace ovis_control

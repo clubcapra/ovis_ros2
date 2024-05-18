@@ -26,7 +26,6 @@ hardware_interface::CallbackReturn OvisHWInterface::on_init(
 {
   if (hardware_interface::SystemInterface::on_init(info) != CallbackReturn::SUCCESS)
   {
-    return CallbackReturn::ERROR;
   }
 
   // TODO(anyone): read parameters and initialize the hardware
