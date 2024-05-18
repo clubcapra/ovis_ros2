@@ -1,0 +1,25 @@
+moveit_setup_assistant_config:
+  urdf:
+    package: ovis_description
+    relative_path: urdf/ovis_standalone.urdf.xacro
+  srdf:
+    relative_path: config/ovis.srdf
+  package_settings:
+    author_name: capra
+    author_email: capra@ens.etsmtl.ca
+    generated_timestamp: 1715834118
+  control_xacro:
+    command:
+      - position
+    state:
+      - position
+      - velocity
+  modified_urdf:
+    xacros:
+      - control_xacro
+  control_xacro:
+    command:
+      - position
+    state:
+      - position
+      - velocity
