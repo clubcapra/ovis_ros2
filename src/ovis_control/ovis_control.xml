@@ -1,0 +1,9 @@
+<library path="ovis_control">
+  <class name="ovis_control/OvisHWInterface"
+         type="ovis_control::OvisHWInterface"
+         base_class_type="hardware_interface::SystemInterface">
+    <description>
+      ros2_control hardware interface.
+    </description>
+  </class>
+</library>
