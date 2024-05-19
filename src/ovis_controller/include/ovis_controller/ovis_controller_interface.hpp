@@ -20,7 +20,7 @@
 #include <vector>
 
 #include "controller_interface/controller_interface.hpp"
-#include "ovis_controller_interface_parameters.hpp"
+// #include "ovis_controller_interface_parameters.hpp"
 #include "ovis_controller/visibility_control.h"
 #include "rclcpp_lifecycle/node_interfaces/lifecycle_node_interface.hpp"
 #include "rclcpp_lifecycle/state.hpp"
@@ -28,24 +28,15 @@
 #include "realtime_tools/realtime_publisher.h"
 #include "std_srvs/srv/set_bool.hpp"
 
+
+#include <moveit_msgs/msg/robot_trajectory.hpp>
+#include <moveit_msgs/msg/robot_state.hpp>
 // TODO(anyone): Replace with controller specific messages
 #include "control_msgs/msg/joint_controller_state.hpp"
 #include "control_msgs/msg/joint_jog.hpp"
 
 namespace ovis_controller
 {
-// name constants for state interfaces
-static constexpr size_t STATE_MY_ITFS = 0;
-
-// name constants for command interfaces
-static constexpr size_t CMD_MY_ITFS = 0;
-
-// TODO(anyone: example setup for control mode (usually you will use some enums defined in messages)
-enum class control_mode_type : std::uint8_t
-{
-  FAST = 0,
-  SLOW = 1,
-};
 
 class OvisController : public controller_interface::ControllerInterface
 {
@@ -78,35 +69,58 @@ public:
   controller_interface::return_type update(
     const rclcpp::Time & time, const rclcpp::Duration & period) override;
 
+  OVIS_CONTROLLER__VISIBILITY_PUBLIC
+  controller_interface::CallbackReturn on_error(
+    const rclcpp_lifecycle::State & previous_state) override;
+
+  OVIS_CONTROLLER__VISIBILITY_PUBLIC
+  controller_interface::CallbackReturn on_cleanup(
+    const rclcpp_lifecycle::State & previous_state) override;
+
+  OVIS_CONTROLLER__VISIBILITY_PUBLIC
+  controller_interface::CallbackReturn on_shutdown(
+    const rclcpp_lifecycle::State & previous_state) override;
+
   // TODO(anyone): replace the state and command message types
-  using ControllerReferenceMsg = control_msgs::msg::JointJog;
-  using ControllerModeSrvType = std_srvs::srv::SetBool;
-  using ControllerStateMsg = control_msgs::msg::JointControllerState;
+  using ControllerReferenceMsg = moveit_msgs::msg::RobotTrajectory;
+  // using ControllerModeSrvType = std_srvs::srv::SetBool;
+  // using ControllerStateMsg = control_msgs::msg::JointControllerState;
+  using ControllerStateMsg = moveit_msgs::msg::RobotState;
 
 protected:
-  std::shared_ptr<ovis_controller_interface::ParamListener> param_listener_;
-  ovis_controller_interface::Params params_;
+  std::vector<std::string> joint_names_;
+  std::vector<std::string> command_interface_types_;
+  std::vector<std::string> state_interface_types_;
 
-  std::vector<std::string> state_joints_;
+  rclcpp::Subscription<trajectory_msgs::msg::JointTrajectory>::SharedPtr joint_command_subscriber_;
+  realtime_tools::RealtimeBuffer<std::shared_ptr<trajectory_msgs::msg::JointTrajectory>>
+    traj_msg_external_point_ptr_;
+  bool new_msg_ = false;
+  rclcpp::Time start_time_;
+  std::shared_ptr<trajectory_msgs::msg::JointTrajectory> trajectory_msg_;
+  trajectory_msgs::msg::JointTrajectoryPoint point_interp_;
 
-  // Command subscribers and Controller State publisher
-  rclcpp::Subscription<ControllerReferenceMsg>::SharedPtr ref_subscriber_ = nullptr;
-  realtime_tools::RealtimeBuffer<std::shared_ptr<ControllerReferenceMsg>> input_ref_;
+  std::vector<std::reference_wrapper<hardware_interface::LoanedCommandInterface>>
+    joint_position_command_interface_;
+  std::vector<std::reference_wrapper<hardware_interface::LoanedCommandInterface>>
+    joint_velocity_command_interface_;
+  std::vector<std::reference_wrapper<hardware_interface::LoanedStateInterface>>
+    joint_position_state_interface_;
+  std::vector<std::reference_wrapper<hardware_interface::LoanedStateInterface>>
+    joint_velocity_state_interface_;
 
-  rclcpp::Service<ControllerModeSrvType>::SharedPtr set_slow_control_mode_service_;
-  realtime_tools::RealtimeBuffer<control_mode_type> control_mode_;
+  std::unordered_map<
+    std::string, std::vector<std::reference_wrapper<hardware_interface::LoanedCommandInterface>> *>
+    command_interface_map_ = {
+      {"position", &joint_position_command_interface_},
+      {"velocity", &joint_velocity_command_interface_}};
 
-  using ControllerStatePublisher = realtime_tools::RealtimePublisher<ControllerStateMsg>;
-
-  rclcpp::Publisher<ControllerStateMsg>::SharedPtr s_publisher_;
-  std::unique_ptr<ControllerStatePublisher> state_publisher_;
-
-private:
-  // callback for topic interface
-  OVIS_CONTROLLER__VISIBILITY_LOCAL
-  void reference_callback(const std::shared_ptr<ControllerReferenceMsg> msg);
-};
-
+  std::unordered_map<
+    std::string, std::vector<std::reference_wrapper<hardware_interface::LoanedStateInterface>> *>
+    state_interface_map_ = {
+      {"position", &joint_position_state_interface_},
+      {"velocity", &joint_velocity_state_interface_}};
+  };
 }  // namespace ovis_controller
 
 #endif  // OVIS_CONTROLLER__OVIS_CONTROLLER_INTERFACE_HPP_

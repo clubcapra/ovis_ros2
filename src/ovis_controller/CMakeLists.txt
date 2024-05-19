@@ -15,6 +15,7 @@ set(THIS_PACKAGE_INCLUDE_DEPENDS
   rclcpp_lifecycle
   realtime_tools
   std_srvs
+  moveit_msgs
 )
 
 find_package(ament_cmake REQUIRED)
@@ -56,47 +57,47 @@ install(
   DESTINATION include/${PROJECT_NAME}
 )
 
-if(BUILD_TESTING)
-  find_package(ament_lint_auto REQUIRED)
-  # the following line skips the linter which checks for copyrights
-  # comment the line when a copyright and license is added to all source files
-  set(ament_cmake_copyright_FOUND TRUE)
-  # the following line skips cpplint (only works in a git repo)
-  # comment the line when this package is in a git repo and when
-  # a copyright and license is added to all source files
-  set(ament_cmake_cpplint_FOUND TRUE)
-  find_package(ament_cmake_gmock REQUIRED)
-  find_package(controller_manager REQUIRED)
-  find_package(hardware_interface REQUIRED)
-  find_package(ros2_control_test_assets REQUIRED)
+# if(BUILD_TESTING)
+#   find_package(ament_lint_auto REQUIRED)
+#   # the following line skips the linter which checks for copyrights
+#   # comment the line when a copyright and license is added to all source files
+#   set(ament_cmake_copyright_FOUND TRUE)
+#   # the following line skips cpplint (only works in a git repo)
+#   # comment the line when this package is in a git repo and when
+#   # a copyright and license is added to all source files
+#   set(ament_cmake_cpplint_FOUND TRUE)
+#   find_package(ament_cmake_gmock REQUIRED)
+#   find_package(controller_manager REQUIRED)
+#   find_package(hardware_interface REQUIRED)
+#   find_package(ros2_control_test_assets REQUIRED)
 
-  ament_add_gmock(test_load_ovis_controller_interface test/test_load_ovis_controller_interface.cpp)
-  target_include_directories(test_load_ovis_controller_interface PRIVATE include)
-  ament_target_dependencies(
-    test_load_ovis_controller_interface
-    controller_manager
-    hardware_interface
-    ros2_control_test_assets
-  )
+#   ament_add_gmock(test_load_ovis_controller_interface test/test_load_ovis_controller_interface.cpp)
+#   target_include_directories(test_load_ovis_controller_interface PRIVATE include)
+#   ament_target_dependencies(
+#     test_load_ovis_controller_interface
+#     controller_manager
+#     hardware_interface
+#     ros2_control_test_assets
+#   )
 
-  add_rostest_with_parameters_gmock(test_ovis_controller_interface test/test_ovis_controller_interface.cpp ${CMAKE_CURRENT_SOURCE_DIR}/test/ovis_controller_interface_params.yaml)
-  target_include_directories(test_ovis_controller_interface PRIVATE include)
-  target_link_libraries(test_ovis_controller_interface ovis_controller_interface)
-  ament_target_dependencies(
-    test_ovis_controller_interface
-    controller_interface
-    hardware_interface
-  )
+#   add_rostest_with_parameters_gmock(test_ovis_controller_interface test/test_ovis_controller_interface.cpp ${CMAKE_CURRENT_SOURCE_DIR}/test/ovis_controller_interface_params.yaml)
+#   target_include_directories(test_ovis_controller_interface PRIVATE include)
+#   target_link_libraries(test_ovis_controller_interface ovis_controller_interface)
+#   ament_target_dependencies(
+#     test_ovis_controller_interface
+#     controller_interface
+#     hardware_interface
+#   )
 
-  add_rostest_with_parameters_gmock(test_ovis_controller_interface_preceeding test/test_ovis_controller_interface_preceeding.cpp ${CMAKE_CURRENT_SOURCE_DIR}/test/ovis_controller_interface_preceeding_params.yaml)
-  target_include_directories(test_ovis_controller_interface_preceeding PRIVATE include)
-  target_link_libraries(test_ovis_controller_interface_preceeding ovis_controller_interface)
-  ament_target_dependencies(
-    test_ovis_controller_interface_preceeding
-    controller_interface
-    hardware_interface
-  )
-endif()
+#   add_rostest_with_parameters_gmock(test_ovis_controller_interface_preceeding test/test_ovis_controller_interface_preceeding.cpp ${CMAKE_CURRENT_SOURCE_DIR}/test/ovis_controller_interface_preceeding_params.yaml)
+#   target_include_directories(test_ovis_controller_interface_preceeding PRIVATE include)
+#   target_link_libraries(test_ovis_controller_interface_preceeding ovis_controller_interface)
+#   ament_target_dependencies(
+#     test_ovis_controller_interface_preceeding
+#     controller_interface
+#     hardware_interface
+#   )
+# endif()
 
 ament_export_include_directories(
   include

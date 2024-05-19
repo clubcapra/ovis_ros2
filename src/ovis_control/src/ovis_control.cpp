@@ -21,89 +21,160 @@
 
 namespace ovis_control
 {
-hardware_interface::CallbackReturn OvisHWInterface::on_init(
-  const hardware_interface::HardwareInfo & info)
-{
-  if (hardware_interface::SystemInterface::on_init(info) != CallbackReturn::SUCCESS)
-  {
-  }
+    hardware_interface::CallbackReturn OvisHWInterface::on_init(
+        const hardware_interface::HardwareInfo &info)
+    {
+        if (hardware_interface::SystemInterface::on_init(info) != CallbackReturn::SUCCESS)
+        {
+            RCLCPP_ERROR_ONCE(rclcpp::get_logger("ovis_control"), "Init failed");
+            return CallbackReturn::ERROR;
+        }
 
-  // TODO(anyone): read parameters and initialize the hardware
-  hw_states_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
-  hw_commands_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
+        hw_states_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
+        hw_commands_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
 
-  return CallbackReturn::SUCCESS;
-}
+        // try
+        // {
+        //     comm = new kinova::KinovaComm(mApiMutex, info);
+        // }
+        // catch(const std::exception& e)
+        // {
+        //     return CallbackReturn::ERROR;
+        // }
 
-hardware_interface::CallbackReturn OvisHWInterface::on_configure(
-  const rclcpp_lifecycle::State & /*previous_state*/)
-{
-  // TODO(anyone): prepare the robot to be ready for read calls and write calls of some interfaces
+        RCLCPP_INFO_ONCE(rclcpp::get_logger("ovis_control"), "Init success");
+        return CallbackReturn::SUCCESS;
+    }
 
-  return CallbackReturn::SUCCESS;
-}
+    hardware_interface::CallbackReturn OvisHWInterface::on_configure(
+        const rclcpp_lifecycle::State & /*previous_state*/)
+    {
 
-std::vector<hardware_interface::StateInterface> OvisHWInterface::export_state_interfaces()
-{
-  std::vector<hardware_interface::StateInterface> state_interfaces;
-  for (size_t i = 0; i < info_.joints.size(); ++i)
-  {
-    state_interfaces.emplace_back(hardware_interface::StateInterface(
-      // TODO(anyone): insert correct interfaces
-      info_.joints[i].name, hardware_interface::HW_IF_POSITION, &hw_states_[i]));
-  }
+        return CallbackReturn::SUCCESS;
+    }
 
-  return state_interfaces;
-}
+    std::vector<hardware_interface::StateInterface> OvisHWInterface::export_state_interfaces()
+    {
+        std::vector<hardware_interface::StateInterface> state_interfaces;
+        for (size_t i = 0; i < info_.joints.size(); ++i)
+        {
+            state_interfaces.emplace_back(hardware_interface::StateInterface(
+                info_.joints[i].name, hardware_interface::HW_IF_POSITION, &hw_states_[i]));
+        }
 
-std::vector<hardware_interface::CommandInterface> OvisHWInterface::export_command_interfaces()
-{
-  std::vector<hardware_interface::CommandInterface> command_interfaces;
-  for (size_t i = 0; i < info_.joints.size(); ++i)
-  {
-    command_interfaces.emplace_back(hardware_interface::CommandInterface(
-      // TODO(anyone): insert correct interfaces
-      info_.joints[i].name, hardware_interface::HW_IF_POSITION, &hw_commands_[i]));
-  }
+        return state_interfaces;
+    }
 
-  return command_interfaces;
-}
+    std::vector<hardware_interface::CommandInterface> OvisHWInterface::export_command_interfaces()
+    {
+        std::vector<hardware_interface::CommandInterface> command_interfaces;
+        for (size_t i = 0; i < info_.joints.size(); ++i)
+        {
+            command_interfaces.emplace_back(hardware_interface::CommandInterface(
+                info_.joints[i].name, hardware_interface::HW_IF_POSITION, &hw_commands_[i]));
+        }
 
-hardware_interface::CallbackReturn OvisHWInterface::on_activate(
-  const rclcpp_lifecycle::State & /*previous_state*/)
-{
-  // TODO(anyone): prepare the robot to receive commands
+        return command_interfaces;
+    }
 
-  return CallbackReturn::SUCCESS;
-}
+    hardware_interface::CallbackReturn OvisHWInterface::on_activate(
+        const rclcpp_lifecycle::State & /*previous_state*/)
+    {
+        try
+        {
+            RCLCPP_INFO(logger(), "Activating");
+            comm = new kinova::KinovaComm(mApiMutex, this->info_);
+            RCLCPP_INFO(logger(), "Activated");
+        }
+        catch(const kinova::KinovaCommException& e)
+        {
+            RCLCPP_ERROR(logger(), e.what());
+            return CallbackReturn::ERROR;
+        }
 
-hardware_interface::CallbackReturn OvisHWInterface::on_deactivate(
-  const rclcpp_lifecycle::State & /*previous_state*/)
-{
-  // TODO(anyone): prepare the robot to stop receiving commands
+        return CallbackReturn::SUCCESS;
+    }
 
-  return CallbackReturn::SUCCESS;
-}
+    hardware_interface::CallbackReturn OvisHWInterface::on_deactivate(
+        const rclcpp_lifecycle::State & /*previous_state*/)
+    {
+        if (comm != nullptr) delete comm;
+        comm = nullptr;
 
-hardware_interface::return_type OvisHWInterface::read(
-  const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)
-{
-  // TODO(anyone): read robot states
+        return CallbackReturn::SUCCESS;
+    }
 
-  return hardware_interface::return_type::OK;
-}
+    hardware_interface::return_type OvisHWInterface::read(
+        const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)
+    {
+        kinova::KinovaAngles angles;
+        try
+        {
+            RCLCPP_INFO(rclcpp::get_logger(get_name()), "Getting angles");
+            comm->getJointAngles(angles);
+            RCLCPP_INFO_STREAM(rclcpp::get_logger(get_name()), "Angles at" << 
+                "\n1:" << angles.Actuator1 <<
+                "\n2:" << angles.Actuator2 <<
+                "\n3:" << angles.Actuator3 <<
+                "\n4:" << angles.Actuator4 <<
+                "\n5:" << angles.Actuator5 <<
+                "\n6:" << angles.Actuator6);
+        }
+        catch (const kinova::KinovaCommException& e)
+        {
+            RCLCPP_ERROR(rclcpp::get_logger(get_name()), e.what());
+            return hardware_interface::return_type::ERROR;
+        }
+        for (size_t i = 0; i < info_.joints.size(); ++i)
+        {
+            hw_states_.at(i) = (double)angles[i];
+        }
+        return hardware_interface::return_type::OK;
+    }
 
-hardware_interface::return_type OvisHWInterface::write(
-  const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)
-{
-  // TODO(anyone): write robot's commands'
+    hardware_interface::return_type OvisHWInterface::write(
+        const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)
+    {
+        kinova::KinovaAngles angles;
+        for (int i = 0; i < info_.joints.size(); ++i)
+        {
+            angles[i] = (float)hw_commands_.at(i);
+        }
+        try
+        {
+            RCLCPP_INFO_STREAM(rclcpp::get_logger(get_name()), "Setting angles to" << 
+                "\n1:" << angles.Actuator1 <<
+                "\n2:" << angles.Actuator2 <<
+                "\n3:" << angles.Actuator3 <<
+                "\n4:" << angles.Actuator4 <<
+                "\n5:" << angles.Actuator5 <<
+                "\n6:" << angles.Actuator6);
+            comm->setJointAngles(angles);
+            RCLCPP_INFO(logger(), "Angles set!");
+        }
+        catch(const kinova::KinovaCommException& e)
+        {
+            RCLCPP_ERROR(logger(), e.what());
+            return hardware_interface::return_type::ERROR;
+        }
+        
+        return hardware_interface::return_type::OK;
+    }
 
-  return hardware_interface::return_type::OK;
-}
+    OvisHWInterface::~OvisHWInterface()
+    {
+        if (comm != nullptr) delete comm;
+        comm = nullptr;
+    }
 
-}  // namespace ovis_control
+    const rclcpp::Logger & OvisHWInterface::logger() const
+    {
+        return rclcpp::get_logger(get_name());
+    }
+} //namespace ovis_control
 
 #include "pluginlib/class_list_macros.hpp"
+#include "ovis_control/ovis_control.hpp"
 
 PLUGINLIB_EXPORT_CLASS(
-  ovis_control::OvisHWInterface, hardware_interface::SystemInterface)
+	ovis_control::OvisHWInterface, hardware_interface::SystemInterface)

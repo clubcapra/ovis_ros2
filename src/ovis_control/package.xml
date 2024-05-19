@@ -9,13 +9,14 @@
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
-  <depend>hardware_interface</depend>
+  <build_depend>hardware_interface</build_depend>
 
-  <depend>pluginlib</depend>
+  <build_depend>pluginlib</build_depend>
 
-  <depend>rclcpp</depend>
+  <build_depend>rclcpp</build_depend>
 
-  <depend>rclcpp_lifecycle</depend>
+  <build_depend>rclcpp_lifecycle</build_depend>
+  <build_depend>angles</build_depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>

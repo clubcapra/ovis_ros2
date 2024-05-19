@@ -6,7 +6,17 @@
         <ros2_control name="${name}" type="system">
             <hardware>
                 <!-- By default, set up controllers for simulation. This won't work on real hardware -->
-                <plugin>mock_components/GenericSystem</plugin>
+                <!-- <plugin>mock_components/GenericSystem</plugin> -->
+                
+                <plugin>ovis_control/OvisHWInterface</plugin>
+                <param name="api_type">ETHERNET</param> <!-- USB or ETHERNET-->
+                <param name="local_machine_ip">192.168.84.15</param>
+                <param name="subnet_mask">255.255.255.0</param>
+                <param name="local_cmd_port">25015</param>
+                <param name="local_broadcast_port">25025</param>
+                <param name="robot_ip_address">192.168.84.160</param>
+                <!-- <param name="serial_number">...</param> -->
+
             </hardware>
             <joint name="ovis_joint_1">
                 <command_interface name="position"/>

@@ -1,70 +1,124 @@
+# Copyright 2023 ros2_control Development Team
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import os
-
-from ament_index_python.packages import get_package_share_directory
+from ament_index_python import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription
+from launch.actions import RegisterEventHandler
+from launch.event_handlers import OnProcessExit
+from launch.substitutions import Command, FindExecutable, PathJoinSubstitution
 
-from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import Command
 from launch_ros.actions import Node
+from launch_ros.substitutions import FindPackageShare
 from launch_ros.parameter_descriptions import ParameterValue
-from launch.actions import DeclareLaunchArgument
+
+from moveit_configs_utils.launches import generate_moveit_rviz_launch, generate_spawn_controllers_launch, generate_move_group_launch
 
 
 def generate_launch_description():
-    # Configure ROS nodes for launch
-
     # Get the launch directory
-    pkg_ovis_bringup = get_package_share_directory('ovis_bringup')
     pkg_ovis_description = get_package_share_directory('ovis_description')
+    bringup_pkg_path = get_package_share_directory('ovis_bringup')
 
-    # # Get the URDF file
-    # world_file_name = 'worlds/base_world.world'
-    # world = os.path.join(pkg_ovis_description, world_file_name)
+    # Get the URDF file
+    urdf_path = os.path.join(pkg_ovis_description, 'urdf', 'ovis_standalone.urdf.xacro')
+    robot_desc = ParameterValue(Command(['xacro ', urdf_path]), value_type=str)
 
-    # # Setup to launch the simulator and Gazebo world
-    # gz_sim = IncludeLaunchDescription(
-    #     PythonLaunchDescriptionSource(
-    #         os.path.join(pkg_ros_gz_sim, 'launch', 'gz_sim.launch.py')),
-    #     launch_arguments={'gz_args': "-v 4 -r " + world}.items(),
+    # robot_controllers = PathJoinSubstitution(
+    #     [
+    #         FindPackageShare("ovis_bringup"),
+    #         "config",
+    #         "ovis_controllers.yaml",
+    #     ]
     # )
-
-    # # Spawn robot
-    # create = Node(
-    #     package='ros_gz_sim',
-    #     executable='create',
-    #     arguments=['-name', 'ovis',
-    #                '-topic', 'robot_description',
-    #                '-x', '0',
-    #                '-y', '0',
-    #                '-z', '0.1',
-    #                ],
-    #     output='screen',
-    # )
-
-    # # Bridge ROS topics and Gazebo messages for establishing communication
-    # bridge = Node(
-    #     package='ros_gz_bridge',
-    #     executable='parameter_bridge',
-    #     parameters=[{
-    #         'config_file': os.path.join(pkg_ovis_description, 'config',
-    #                                     'default_bridge.yaml'),
-    #         'qos_overrides./tf_static.publisher.durability': 'transient_local',
-    #         "use_sim_time": True,
-    #     }],
-    #     output='screen'
-    # )
-
-    # Include common launch configuration
-    common = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(pkg_ovis_bringup, "launch", "common.launch.py"),
-        ),
+    
+    robot_controllers = PathJoinSubstitution(
+        [
+            FindPackageShare("ovis_moveit"),
+            "config",
+            "ovis_controllers.yaml",
+        ]
     )
 
-    return LaunchDescription([
-            # gz_sim,
-            # bridge,
-            # create,
-            common,
-            ])
+    
+    
+    control_node = Node(
+        package="controller_manager",
+        executable="ros2_control_node",
+        parameters=[robot_controllers],
+        remappings=[
+            (
+                "/forward_position_controller/commands",
+                "/position_commands",
+            ),
+        ],
+        output="both",
+    )
+    
+    # Takes the description and joint angles as inputs and publishes
+    robot_state_pub_node = Node(
+        package='robot_state_publisher',
+        executable='robot_state_publisher',
+        name='robot_state_publisher',
+        output='both',
+        parameters=[
+            {'robot_description': robot_desc},
+            # {"use_sim_time": True, }
+        ]
+    )
+    # Visualize in RViz
+    rviz_node = Node(
+       package='rviz2',
+       executable='rviz2',
+       arguments=['-d', os.path.join(pkg_ovis_description, 'config',
+                                     'basic.rviz')],
+    )
+
+    joint_state_broadcaster_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=["joint_state_broadcaster", "--controller-manager", "/controller_manager"],
+    )
+
+    robot_controller_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=["ovis_controller", "-c", "/controller_manager"],
+    )
+
+    # Delay rviz start after `joint_state_broadcaster`
+    delay_rviz_after_joint_state_broadcaster_spawner = RegisterEventHandler(
+        event_handler=OnProcessExit(
+            target_action=joint_state_broadcaster_spawner,
+            on_exit=[rviz_node],
+        )
+    )
+
+    # Delay start of robot_controller after `joint_state_broadcaster`
+    delay_robot_controller_spawner_after_joint_state_broadcaster_spawner = RegisterEventHandler(
+        event_handler=OnProcessExit(
+            target_action=joint_state_broadcaster_spawner,
+            on_exit=[robot_controller_spawner],
+        )
+    )
+
+    nodes = [
+        control_node,
+        robot_state_pub_node,
+        joint_state_broadcaster_spawner,
+        delay_rviz_after_joint_state_broadcaster_spawner,
+        delay_robot_controller_spawner_after_joint_state_broadcaster_spawner,
+    ]
+
+    return LaunchDescription(nodes)

@@ -28,6 +28,7 @@
 
 // Kinova includes
 #include "kinova_driver/kinova_api.h"
+#include "kinova_driver/kinova_comm.h"
 
 
 namespace ovis_control
@@ -65,10 +66,15 @@ public:
   hardware_interface::return_type write(
     const rclcpp::Time & time, const rclcpp::Duration & period) override;
 
+  virtual ~OvisHWInterface();
+
 private:
   std::vector<double> hw_commands_;
   std::vector<double> hw_states_;
-  kinova::KinovaAPI mAPI{};
+  kinova::KinovaComm* comm = nullptr;
+  boost::recursive_mutex mApiMutex{};
+
+  const rclcpp::Logger& logger() const;
 };
 
 }  // namespace ovis_control

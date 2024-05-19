@@ -43,7 +43,7 @@
  *
  */
 
-#include "rclcpp/rclcpp.hpp"
+// #include "rclcpp/rclcpp.hpp"
 #include "kinova_driver/kinova_comm.h"
 #include <string>
 #include <vector>
@@ -53,10 +53,8 @@
 namespace kinova
 {
 
-KinovaComm::KinovaComm(const std::shared_ptr<rclcpp::Node> node_handle,
-                   boost::recursive_mutex &api_mutex,
-                   const bool is_movement_on_start,
-                   const std::string &kinova_robotType)
+KinovaComm::KinovaComm(boost::recursive_mutex& api_mutex, 
+                    const hardware_interface::HardwareInfo& info)
     : is_software_stop_(false), api_mutex_(api_mutex)
 {
     boost::recursive_mutex::scoped_lock lock(api_mutex_);
@@ -64,10 +62,7 @@ KinovaComm::KinovaComm(const std::shared_ptr<rclcpp::Node> node_handle,
     int result = NO_ERROR_KINOVA;
 
     //initialize kinova api functions
-    std::string api_type;
-    if (!node_handle->has_parameter("connection_type"))
-        node_handle->declare_parameter("connection_type", "USB");
-    node_handle->get_parameter("connection_type", api_type);
+    std::string api_type = info.hardware_parameters.at("api_type");
     if (api_type == "USB")
       kinova_api_.initializeKinovaAPIFunctions(USB);
     else
@@ -78,33 +73,32 @@ KinovaComm::KinovaComm(const std::shared_ptr<rclcpp::Node> node_handle,
     EthernetCommConfig ethernet_settings;
     std::string local_IP,subnet_mask;
     int local_cmd_port,local_bcast_port;
-    if (!node_handle->has_parameter("local_machine_IP"))
-        node_handle->declare_parameter("local_machine_IP", local_IP);
-    if (!node_handle->has_parameter("subnet_mask"))
-        node_handle->declare_parameter("subnet_mask", subnet_mask);
-    if (!node_handle->has_parameter("local_cmd_port"))
-        node_handle->declare_parameter("local_cmd_port", local_cmd_port);
-    if (!node_handle->has_parameter("local_broadcast_port"))
-        node_handle->declare_parameter("local_broadcast_port", local_bcast_port);
-    node_handle->get_parameter("local_machine_IP", local_IP);
-    node_handle->get_parameter("subnet_mask", subnet_mask);
-    node_handle->get_parameter("local_cmd_port", local_cmd_port);
-    node_handle->get_parameter("local_broadcast_port", local_bcast_port);
+    if (info.hardware_parameters.find("local_machine_IP") != info.hardware_parameters.end())
+        local_IP = info.hardware_parameters.at("local_machine_IP");
+    if (info.hardware_parameters.find("subnet_mask") != info.hardware_parameters.end())
+        subnet_mask = info.hardware_parameters.at("subnet_mask");
+    if (info.hardware_parameters.find("local_cmd_port") != info.hardware_parameters.end())
+        local_cmd_port = std::stoi(info.hardware_parameters.at("local_cmd_port"));
+    if (info.hardware_parameters.find("local_broadcast_port") != info.hardware_parameters.end())
+        local_bcast_port = stoi(info.hardware_parameters.at("local_broadcast_port"));
+
+    std::string robot_ip_address = "192.168.84.160";
+    if (info.hardware_parameters.find("robot_ip_address") != info.hardware_parameters.end())
+        robot_ip_address = info.hardware_parameters.at("robot_ip_address");
 
     ethernet_settings.localCmdport = local_cmd_port;
     ethernet_settings.localBcastPort = local_bcast_port;
     ethernet_settings.localIpAddress = inet_addr(local_IP.c_str());
     ethernet_settings.subnetMask = inet_addr(subnet_mask.c_str());
     ethernet_settings.rxTimeOutInMs = 1000;
-    ethernet_settings.robotIpAddress = inet_addr("192.168.100.11");
+    ethernet_settings.robotIpAddress = inet_addr(robot_ip_address.c_str());
     ethernet_settings.robotPort = 55000;
 
     // Get the serial number parameter for the arm we wish to connect to
     std::string serial_number = "";
-    if (!node_handle->has_parameter("serial_number"))
-        node_handle->declare_parameter("serial_number", serial_number);
-    node_handle->get_parameter("serial_number", serial_number);
-
+    if (info.hardware_parameters.find("serial_number") != info.hardware_parameters.end())
+        serial_number = info.hardware_parameters.at("serial_number");
+    
     int api_version[API_VERSION_COUNT];
     result = kinova_api_.getAPIVersion(api_version);
     if (result != NO_ERROR_KINOVA)
@@ -194,8 +188,10 @@ KinovaComm::KinovaComm(const std::shared_ptr<rclcpp::Node> node_handle,
     }
 
     //find the number of joints and fingers of the arm using robotType passed from arm node
-    num_joints_ = kinova_robotType[3]-'0';
-    num_fingers_ = kinova_robotType[5]-'0';
+    // num_joints_ = kinova_robotType[3]-'0';
+    // num_fingers_ = kinova_robotType[5]-'0';
+    num_joints_ = 6;
+    num_joints_ = 2;
 
     // On a cold boot the arm may not respond to commands from the API right away.
     // This kick-starts the Control API so that it's ready to go.
@@ -204,33 +200,41 @@ KinovaComm::KinovaComm(const std::shared_ptr<rclcpp::Node> node_handle,
     startAPI();
 
     //Set robot to use manual COM parameters
-    bool use_estimated_COM;
-    if (!node_handle->has_parameter("torque_parameters/use_estimated_COM_parameters"))
-        node_handle->declare_parameter("torque_parameters/use_estimated_COM_parameters", true);
-    node_handle->get_parameter("torque_parameters/use_estimated_COM_parameters",use_estimated_COM);
-    if (use_estimated_COM == true)
-        kinova_api_.setGravityType(OPTIMAL);
-    else
-        kinova_api_.setGravityType(MANUAL_INPUT);
+    // bool use_estimated_COM;
+    // if (!node_handle->has_parameter("torque_parameters/use_estimated_COM_parameters"))
+    //     node_handle->declare_parameter("torque_parameters/use_estimated_COM_parameters", true);
+    // node_handle->get_parameter("torque_parameters/use_estimated_COM_parameters",use_estimated_COM);
+    // if (use_estimated_COM == true)
+    //     kinova_api_.setGravityType(OPTIMAL);
+    // else
+    //     kinova_api_.setGravityType(MANUAL_INPUT);
 
     //Set torque safety factor to 1
+    /*
+    Once in torque mode, some safety features can bring back the arm in position mode. This is the case when
+    one of the motors’ rotation velocity gets too high. Users can disable this safety feature at their own risk
+    using the Torque Console or API (Safety Factor to 0). By default, the robot will also switch back to position
+    mode if the hand gets too close from the base or if a specific joint gets too close from its angle limits. Users
+    can disable the base collision avoidance safety feature at their own risk using the API. 
+    From: https://www.google.com/url?sa=t&rct=j&q=&esrc=s&source=web&cd=&ved=2ahUKEwit34vni5iGAxWBATQIHR8mDXwQFnoECA4QAQ&url=https%3A%2F%2Fartifactory.kinovaapps.com%2Fui%2Fapi%2Fv1%2Fdownload%3FrepoKey%3Dgeneric-documentation-public%26path%3DDocumentation%25252FGen2%25252FTechnical%252520documentation%25252FUser%252520Guide%25252FUG-009_KINOVA_Gen2_Ultra_lightweight_robot_User_guide_EN_R03.pdf&usg=AOvVaw0p_cHIkYO-XqQqnGBK_HrA&opi=89978449
+    Page 37
+    */
     kinova_api_.setTorqueSafetyFactor(1);
-
 
     // Set the angular velocity of each of the joints to zero
     TrajectoryPoint kinova_velocity;
     memset(&kinova_velocity, 0, sizeof(kinova_velocity));
     setCartesianVelocities(kinova_velocity.Position.CartesianPosition);
 
-    if (is_movement_on_start)
-    {
-        initFingers();
-    }
-    else
-    {
-        RCLCPP_WARN(rclcpp::get_logger("kinova_comm"), "Movement on connection to the arm has been suppressed on initialization. You may "
-                 "have to home the arm (through the home service) before movement is possible");
-    }
+    // if (is_movement_on_start)
+    // {
+    //     initFingers();
+    // }
+    // else
+    // {
+    //     RCLCPP_WARN(rclcpp::get_logger("kinova_comm"), "Movement on connection to the arm has been suppressed on initialization. You may "
+    //              "have to home the arm (through the home service) before movement is possible");
+    // }
 }
 
 

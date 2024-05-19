@@ -288,26 +288,6 @@ const char* KinovaCommException::what() const throw()
 // -----------------
 /**
  * @brief KinovaPose::KinovaPose
- * obtain KinovaPose from standard ROS geometry_msg.
- * @param pose ROS geometry_msgs[x,y,z,qx,qy,qz,qw], in meters and quaterion.
- * @warning KinovaPose use Euler-XYZ convention, while ROS use Euler-ZYX convention by default.
- */
-KinovaPose::KinovaPose(const geometry_msgs::msg::Pose &pose)
-{
-    tf2::Quaternion q(
-        pose.orientation.x,pose.orientation.y,pose.orientation.z,pose.orientation.w
-    );
-
-    X = static_cast<float>(pose.position.x);
-    Y = static_cast<float>(pose.position.y);
-    Z = static_cast<float>(pose.position.z);
-
-    getEulerXYZ(q,ThetaX, ThetaY,ThetaZ);
-}
-
-
-/**
- * @brief KinovaPose::KinovaPose
  * Copy from CartesianInfo to KinovaPose, and change degree to radians.
  * @param pose units are in meters and degrees
  */
@@ -321,72 +301,6 @@ KinovaPose::KinovaPose(const CartesianInfo &pose)
     ThetaY = normalizeInRads(pose.ThetaY);
     ThetaZ = normalizeInRads(pose.ThetaZ);
 }
-
-/**
- * @brief construct geometric::Pose message from KinovaPose
- * @return geometry_msgs::Pose[x,y,z,qx,qy,qz,qw] position in meters, orientation is in Quaternion.
- */
-geometry_msgs::msg::Pose KinovaPose::constructPoseMsg()
-{
-    geometry_msgs::msg::Pose pose;
-    tf2::Quaternion position_quaternion;
-
-    // However, DSP using Euler-XYZ, while ROS using Euler-ZYX.
-    KinovaPose::getQuaternion(position_quaternion);
-    pose.orientation.x = position_quaternion.getX();
-    pose.orientation.y = position_quaternion.getY();
-    pose.orientation.z = position_quaternion.getZ();
-    pose.orientation.w = position_quaternion.getW();
-
-    pose.position.x = X;
-    pose.position.y = Y;
-    pose.position.z = Z;
-
-    return pose;
-}
-
-
-kinova_msgs::msg::KinovaPose KinovaPose::constructKinovaPoseMsg()
-{
-    kinova_msgs::msg::KinovaPose pose;
-
-    pose.x = X;
-    pose.y = Y;
-    pose.z = Z;
-    pose.theta_x = ThetaX;
-    pose.theta_y = ThetaY;
-    pose.theta_z = ThetaZ;
-
-    return pose;
-}
-
-void KinovaPose::getQuaternion(tf2::Quaternion &q)
-{
-    q = EulerXYZ2Quaternion(ThetaX, ThetaY, ThetaZ);
-}
-
-
-/**
- * @brief construct geometric::Wrench message from KinovaPose data structure
- *
- * KinovaPose[X,Y,Z,ThetaX,ThetaY,ThetaZ] doesn't store pose information in this case. Instead, it stores force and torque correspondingly.
- *
- * @return geometry_msgs [Fx,Fy,Fz,Tx,Ty,Tz] in Newton and Nm.
- */
-geometry_msgs::msg::Wrench KinovaPose::constructWrenchMsg()
-{
-    geometry_msgs::msg::Wrench wrench;
-
-    wrench.force.x  = X;
-    wrench.force.y  = Y;
-    wrench.force.z  = Z;
-    wrench.torque.x = ThetaX;
-    wrench.torque.y = ThetaY;
-    wrench.torque.z = ThetaZ;
-
-    return wrench;
-}
-
 
 /**
  * @brief check all the position and orientation values, to determine if current KinovaPose reach "other"
@@ -416,25 +330,6 @@ bool KinovaPose::isCloseToOther(const KinovaPose &other, float position_toleranc
 
 /**
  * @brief KinovaAngles[Actuator1 ... Actuator7] stores 7 joint values in degrees
- *
- * KinovaAngles[Actuator1 ... Actuator7] can go beyond the range of [0 360]
- *
- * @param angles in degrees
- */
-KinovaAngles::KinovaAngles(const kinova_msgs::msg::JointAngles &angles)
-{
-
-    Actuator1 = angles.joint1;
-    Actuator2 = angles.joint2;
-    Actuator3 = angles.joint3;
-    Actuator4 = angles.joint4;
-    Actuator5 = angles.joint5;
-    Actuator6 = angles.joint6;
-    Actuator7 = angles.joint7;
-}
-
-/**
- * @brief KinovaAngles[Actuator1 ... Actuator7] stores 7 joint values in degrees
  * @param angles in degrees
  */
 KinovaAngles::KinovaAngles(const AngularInfo &angles)
@@ -447,24 +342,6 @@ KinovaAngles::KinovaAngles(const AngularInfo &angles)
     Actuator6 = angles.Actuator6;
     Actuator7 = angles.Actuator7;
 }
-
-/**
- * @brief KinovaAngles::constructAnglesMsg
- * @return kinova_msgs::JointAngles is used as messanges for topic in ROS, in degrees.
- */
-kinova_msgs::msg::JointAngles KinovaAngles::constructAnglesMsg()
-{
-    kinova_msgs::msg::JointAngles angles;
-    angles.joint1 = Actuator1;
-    angles.joint2 = Actuator2;
-    angles.joint3 = Actuator3;
-    angles.joint4 = Actuator4;
-    angles.joint5 = Actuator5;
-    angles.joint6 = Actuator6;
-    angles.joint7 = Actuator7;
-    return angles;
-}
-
 
 /**
  * @brief check all the joint values, to determine if current KinovaAngles reach "other"
@@ -501,32 +378,12 @@ bool KinovaAngles::isCloseToOther(const KinovaAngles &other, float tolerance) co
     return status;
 }
 
-
-FingerAngles::FingerAngles(const kinova_msgs::msg::FingerPosition &position)
-{
-    Finger1 = position.finger1;
-    Finger2 = position.finger2;
-    Finger3 = position.finger3;
-}
-
-
 FingerAngles::FingerAngles(const FingersPosition &angle)
 {
     Finger1 = angle.Finger1;
     Finger2 = angle.Finger2;
     Finger3 = angle.Finger3;
 }
-
-
-kinova_msgs::msg::FingerPosition FingerAngles::constructFingersMsg()
-{
-    kinova_msgs::msg::FingerPosition angles;
-    angles.finger1 = Finger1;
-    angles.finger2 = Finger2;
-    angles.finger3 = Finger3;
-    return angles;
-}
-
 
 bool FingerAngles::isCloseToOther(const FingerAngles &other, float tolerance) const
 {

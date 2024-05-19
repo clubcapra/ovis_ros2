@@ -21,240 +21,182 @@
 
 #include "controller_interface/helpers.hpp"
 
-namespace
-{  // utility
-
-// TODO(destogl): remove this when merged upstream
-// Changed services history QoS to keep all so we don't lose any client service calls
-static constexpr rmw_qos_profile_t rmw_qos_profile_services_hist_keep_all = {
-  RMW_QOS_POLICY_HISTORY_KEEP_ALL,
-  1,  // message queue depth
-  RMW_QOS_POLICY_RELIABILITY_RELIABLE,
-  RMW_QOS_POLICY_DURABILITY_VOLATILE,
-  RMW_QOS_DEADLINE_DEFAULT,
-  RMW_QOS_LIFESPAN_DEFAULT,
-  RMW_QOS_POLICY_LIVELINESS_SYSTEM_DEFAULT,
-  RMW_QOS_LIVELINESS_LEASE_DURATION_DEFAULT,
-  false};
-
-using ControllerReferenceMsg = ovis_controller::OvisController::ControllerReferenceMsg;
-
-// called from RT control loop
-void reset_controller_reference_msg(
-  std::shared_ptr<ControllerReferenceMsg> & msg, const std::vector<std::string> & joint_names)
-{
-  msg->joint_names = joint_names;
-  msg->displacements.resize(joint_names.size(), std::numeric_limits<double>::quiet_NaN());
-  msg->velocities.resize(joint_names.size(), std::numeric_limits<double>::quiet_NaN());
-  msg->duration = std::numeric_limits<double>::quiet_NaN();
-}
-
-}  // namespace
+using config_type = controller_interface::interface_configuration_type;
 
 namespace ovis_controller
 {
-OvisController::OvisController() : controller_interface::ControllerInterface() {}
+  OvisController::OvisController() : controller_interface::ControllerInterface() {}
 
-controller_interface::CallbackReturn OvisController::on_init()
-{
-  control_mode_.initRT(control_mode_type::FAST);
-
-  try
+  controller_interface::CallbackReturn OvisController::on_init()
   {
-    param_listener_ = std::make_shared<ovis_controller_interface::ParamListener>(get_node());
-  }
-  catch (const std::exception & e)
-  {
-    fprintf(stderr, "Exception thrown during controller's init with message: %s \n", e.what());
-    return controller_interface::CallbackReturn::ERROR;
-  }
+    // should have error handling
+    joint_names_ = auto_declare<std::vector<std::string>>("joints", joint_names_);
+    command_interface_types_ =
+        auto_declare<std::vector<std::string>>("command_interfaces", command_interface_types_);
+    state_interface_types_ =
+        auto_declare<std::vector<std::string>>("state_interfaces", state_interface_types_);
 
-  return controller_interface::CallbackReturn::SUCCESS;
-}
+    point_interp_.positions.assign(joint_names_.size(), 0);
+    point_interp_.velocities.assign(joint_names_.size(), 0);
 
-controller_interface::CallbackReturn OvisController::on_configure(
-  const rclcpp_lifecycle::State & /*previous_state*/)
-{
-  params_ = param_listener_->get_params();
-
-  if (!params_.state_joints.empty())
-  {
-    state_joints_ = params_.state_joints;
-  }
-  else
-  {
-    state_joints_ = params_.joints;
+    return controller_interface::CallbackReturn::SUCCESS;
   }
 
-  if (params_.joints.size() != state_joints_.size())
+  controller_interface::CallbackReturn OvisController::on_configure(
+      const rclcpp_lifecycle::State & /*previous_state*/)
   {
-    RCLCPP_FATAL(
-      get_node()->get_logger(),
-      "Size of 'joints' (%zu) and 'state_joints' (%zu) parameters has to be the same!",
-      params_.joints.size(), state_joints_.size());
-    return CallbackReturn::FAILURE;
-  }
-
-  // topics QoS
-  auto subscribers_qos = rclcpp::SystemDefaultsQoS();
-  subscribers_qos.keep_last(1);
-  subscribers_qos.best_effort();
-
-  // Reference Subscriber
-  ref_subscriber_ = get_node()->create_subscription<ControllerReferenceMsg>(
-    "~/reference", subscribers_qos,
-    std::bind(&OvisController::reference_callback, this, std::placeholders::_1));
-
-  std::shared_ptr<ControllerReferenceMsg> msg = std::make_shared<ControllerReferenceMsg>();
-  reset_controller_reference_msg(msg, params_.joints);
-  input_ref_.writeFromNonRT(msg);
-
-  auto set_slow_mode_service_callback =
-    [&](
-      const std::shared_ptr<ControllerModeSrvType::Request> request,
-      std::shared_ptr<ControllerModeSrvType::Response> response)
-  {
-    if (request->data)
+    auto callback =
+        [this](const std::shared_ptr<trajectory_msgs::msg::JointTrajectory> traj_msg) -> void
     {
-      control_mode_.writeFromNonRT(control_mode_type::SLOW);
-    }
-    else
+      traj_msg_external_point_ptr_.writeFromNonRT(traj_msg);
+      new_msg_ = true;
+    };
+
+    joint_command_subscriber_ =
+        get_node()->create_subscription<trajectory_msgs::msg::JointTrajectory>(
+            "~/joint_trajectory", rclcpp::SystemDefaultsQoS(), callback);
+
+    return CallbackReturn::SUCCESS;
+  }
+
+  controller_interface::InterfaceConfiguration OvisController::command_interface_configuration() const
+  {
+    controller_interface::InterfaceConfiguration conf = {config_type::INDIVIDUAL, {}};
+
+    conf.names.reserve(joint_names_.size() * command_interface_types_.size());
+    for (const auto &joint_name : joint_names_)
     {
-      control_mode_.writeFromNonRT(control_mode_type::FAST);
-    }
-    response->success = true;
-  };
-
-  set_slow_control_mode_service_ = get_node()->create_service<ControllerModeSrvType>(
-    "~/set_slow_control_mode", set_slow_mode_service_callback,
-    rmw_qos_profile_services_hist_keep_all);
-
-  try
-  {
-    // State publisher
-    s_publisher_ =
-      get_node()->create_publisher<ControllerStateMsg>("~/state", rclcpp::SystemDefaultsQoS());
-    state_publisher_ = std::make_unique<ControllerStatePublisher>(s_publisher_);
-  }
-  catch (const std::exception & e)
-  {
-    fprintf(
-      stderr, "Exception thrown during publisher creation at configure stage with message : %s \n",
-      e.what());
-    return controller_interface::CallbackReturn::ERROR;
-  }
-
-  // TODO(anyone): Reserve memory in state publisher depending on the message type
-  state_publisher_->lock();
-  state_publisher_->msg_.header.frame_id = params_.joints[0];
-  state_publisher_->unlock();
-
-  RCLCPP_INFO(get_node()->get_logger(), "configure successful");
-  return controller_interface::CallbackReturn::SUCCESS;
-}
-
-void OvisController::reference_callback(const std::shared_ptr<ControllerReferenceMsg> msg)
-{
-  if (msg->joint_names.size() == params_.joints.size())
-  {
-    input_ref_.writeFromNonRT(msg);
-  }
-  else
-  {
-    RCLCPP_ERROR(
-      get_node()->get_logger(),
-      "Received %zu , but expected %zu joints in command. Ignoring message.",
-      msg->joint_names.size(), params_.joints.size());
-  }
-}
-
-controller_interface::InterfaceConfiguration OvisController::command_interface_configuration() const
-{
-  controller_interface::InterfaceConfiguration command_interfaces_config;
-  command_interfaces_config.type = controller_interface::interface_configuration_type::INDIVIDUAL;
-
-  command_interfaces_config.names.reserve(params_.joints.size());
-  for (const auto & joint : params_.joints)
-  {
-    command_interfaces_config.names.push_back(joint + "/" + params_.interface_name);
-  }
-
-  return command_interfaces_config;
-}
-
-controller_interface::InterfaceConfiguration OvisController::state_interface_configuration() const
-{
-  controller_interface::InterfaceConfiguration state_interfaces_config;
-  state_interfaces_config.type = controller_interface::interface_configuration_type::INDIVIDUAL;
-
-  state_interfaces_config.names.reserve(state_joints_.size());
-  for (const auto & joint : state_joints_)
-  {
-    state_interfaces_config.names.push_back(joint + "/" + params_.interface_name);
-  }
-
-  return state_interfaces_config;
-}
-
-controller_interface::CallbackReturn OvisController::on_activate(
-  const rclcpp_lifecycle::State & /*previous_state*/)
-{
-  // TODO(anyone): if you have to manage multiple interfaces that need to be sorted check
-  // `on_activate` method in `JointTrajectoryController` for examplary use of
-  // `controller_interface::get_ordered_interfaces` helper function
-
-  // Set default value in command
-  reset_controller_reference_msg(*(input_ref_.readFromRT)(), params_.joints);
-
-  return controller_interface::CallbackReturn::SUCCESS;
-}
-
-controller_interface::CallbackReturn OvisController::on_deactivate(
-  const rclcpp_lifecycle::State & /*previous_state*/)
-{
-  // TODO(anyone): depending on number of interfaces, use definitions, e.g., `CMD_MY_ITFS`,
-  // instead of a loop
-  for (size_t i = 0; i < command_interfaces_.size(); ++i)
-  {
-    command_interfaces_[i].set_value(std::numeric_limits<double>::quiet_NaN());
-  }
-  return controller_interface::CallbackReturn::SUCCESS;
-}
-
-controller_interface::return_type OvisController::update(
-  const rclcpp::Time & time, const rclcpp::Duration & /*period*/)
-{
-  auto current_ref = input_ref_.readFromRT();
-
-  // TODO(anyone): depending on number of interfaces, use definitions, e.g., `CMD_MY_ITFS`,
-  // instead of a loop
-  for (size_t i = 0; i < command_interfaces_.size(); ++i)
-  {
-    if (!std::isnan((*current_ref)->displacements[i]))
-    {
-      if (*(control_mode_.readFromRT()) == control_mode_type::SLOW)
+      for (const auto &interface_type : command_interface_types_)
       {
-        (*current_ref)->displacements[i] /= 2;
+        conf.names.push_back(joint_name + "/" + interface_type);
       }
-      command_interfaces_[i].set_value((*current_ref)->displacements[i]);
+    }
 
-      (*current_ref)->displacements[i] = std::numeric_limits<double>::quiet_NaN();
+    return conf;
+  }
+
+  controller_interface::InterfaceConfiguration OvisController::state_interface_configuration() const
+  {
+    controller_interface::InterfaceConfiguration conf = {config_type::INDIVIDUAL, {}};
+
+    conf.names.reserve(joint_names_.size() * state_interface_types_.size());
+    for (const auto &joint_name : joint_names_)
+    {
+      for (const auto &interface_type : state_interface_types_)
+      {
+        conf.names.push_back(joint_name + "/" + interface_type);
+      }
+    }
+
+    return conf;
+  }
+
+  controller_interface::CallbackReturn OvisController::on_activate(
+      const rclcpp_lifecycle::State & /*previous_state*/)
+  {
+    // clear out vectors in case of restart
+    joint_position_command_interface_.clear();
+    joint_velocity_command_interface_.clear();
+    joint_position_state_interface_.clear();
+    joint_velocity_state_interface_.clear();
+
+    // assign command interfaces
+    for (auto &interface : command_interfaces_)
+    {
+      command_interface_map_[interface.get_interface_name()]->push_back(interface);
+    }
+
+    // assign state interfaces
+    for (auto &interface : state_interfaces_)
+    {
+      state_interface_map_[interface.get_interface_name()]->push_back(interface);
+    }
+
+    return CallbackReturn::SUCCESS;
+  }
+
+  controller_interface::CallbackReturn OvisController::on_deactivate(
+      const rclcpp_lifecycle::State & /*previous_state*/)
+  {
+    release_interfaces();
+
+    return CallbackReturn::SUCCESS;
+  }
+
+  void interpolate_point(
+      const trajectory_msgs::msg::JointTrajectoryPoint &point_1,
+      const trajectory_msgs::msg::JointTrajectoryPoint &point_2,
+      trajectory_msgs::msg::JointTrajectoryPoint &point_interp, double delta)
+  {
+    for (size_t i = 0; i < point_1.positions.size(); i++)
+    {
+      point_interp.positions[i] = delta * point_2.positions[i] + (1.0 - delta) * point_2.positions[i];
+    }
+    for (size_t i = 0; i < point_1.positions.size(); i++)
+    {
+      point_interp.velocities[i] =
+          delta * point_2.velocities[i] + (1.0 - delta) * point_2.velocities[i];
     }
   }
 
-  if (state_publisher_ && state_publisher_->trylock())
+  void interpolate_trajectory_point(
+      const trajectory_msgs::msg::JointTrajectory &traj_msg, const rclcpp::Duration &cur_time,
+      trajectory_msgs::msg::JointTrajectoryPoint &point_interp)
   {
-    state_publisher_->msg_.header.stamp = time;
-    state_publisher_->msg_.set_point = command_interfaces_[CMD_MY_ITFS].get_value();
-    state_publisher_->unlockAndPublish();
+    double traj_len = traj_msg.points.size();
+    auto last_time = traj_msg.points[traj_len - 1].time_from_start;
+    double total_time = last_time.sec + last_time.nanosec * 1E-9;
+
+    size_t ind = cur_time.seconds() * (traj_len / total_time);
+    ind = std::min(static_cast<double>(ind), traj_len - 2);
+    double delta = cur_time.seconds() - ind * (total_time / traj_len);
+    interpolate_point(traj_msg.points[ind], traj_msg.points[ind + 1], point_interp, delta);
   }
 
-  return controller_interface::return_type::OK;
-}
+  controller_interface::return_type OvisController::update(
+      const rclcpp::Time &time, const rclcpp::Duration & /*period*/)
+  {
+    if (new_msg_)
+    {
+      trajectory_msg_ = *traj_msg_external_point_ptr_.readFromRT();
+      start_time_ = time;
+      new_msg_ = false;
+    }
 
-}  // namespace ovis_controller
+    if (trajectory_msg_ != nullptr)
+    {
+      interpolate_trajectory_point(*trajectory_msg_, time - start_time_, point_interp_);
+      for (size_t i = 0; i < joint_position_command_interface_.size(); i++)
+      {
+        joint_position_command_interface_[i].get().set_value(point_interp_.positions[i]);
+      }
+      for (size_t i = 0; i < joint_velocity_command_interface_.size(); i++)
+      {
+        joint_velocity_command_interface_[i].get().set_value(point_interp_.velocities[i]);
+      }
+    }
+
+    return controller_interface::return_type::OK;
+  }
+
+  controller_interface::CallbackReturn OvisController::on_error(const rclcpp_lifecycle::State &previous_state)
+  {
+    return controller_interface::CallbackReturn::SUCCESS;
+  }
+
+  controller_interface::CallbackReturn OvisController::on_cleanup(const rclcpp_lifecycle::State &previous_state)
+  {
+    return controller_interface::CallbackReturn::SUCCESS;
+  }
+
+  controller_interface::CallbackReturn OvisController::on_shutdown(const rclcpp_lifecycle::State &previous_state)
+  {
+    return controller_interface::CallbackReturn::SUCCESS;
+  }
+} // namespace ovis_controller
 
 #include "pluginlib/class_list_macros.hpp"
+#include "ovis_controller/ovis_controller_interface.hpp"
 
 PLUGINLIB_EXPORT_CLASS(
-  ovis_controller::OvisController, controller_interface::ControllerInterface)
+    ovis_controller::OvisController, controller_interface::ControllerInterface)

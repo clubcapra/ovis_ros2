@@ -47,11 +47,6 @@
 #define KINOVA_DRIVER_KINOVA_TYPES_H
 
 #include <kinova/KinovaTypes.h>
-#include "geometry_msgs//msg/pose.hpp"
-#include "geometry_msgs//msg/wrench.hpp"
-#include "kinova_msgs/msg/joint_angles.hpp"
-#include "kinova_msgs/msg/finger_position.hpp"
-#include "kinova_msgs/msg/kinova_pose.hpp"
 #include "tf2/utils.h"
 
 #include <string>
@@ -89,12 +84,12 @@ class KinovaPose : public CartesianInfo
 {
  public:
     KinovaPose() {}
-    explicit KinovaPose(const geometry_msgs::msg::Pose &pose);
+   //  explicit KinovaPose(const geometry_msgs::msg::Pose &pose);
     explicit KinovaPose(const CartesianInfo &pose);
 
-    geometry_msgs::msg::Pose constructPoseMsg();
-    kinova_msgs::msg::KinovaPose constructKinovaPoseMsg();
-    geometry_msgs::msg::Wrench constructWrenchMsg();
+   //  geometry_msgs::msg::Pose constructPoseMsg();
+   //  kinova_msgs::msg::KinovaPose constructKinovaPoseMsg();
+   //  geometry_msgs::msg::Wrench constructWrenchMsg();
     void getQuaternion(tf2::Quaternion &q);
 
     bool isCloseToOther(const KinovaPose &, float position_tolerance, float EulerAngle_tolerance) const;
@@ -105,10 +100,10 @@ class KinovaAngles : public AngularInfo
 {
  public:
     KinovaAngles() {}
-    explicit KinovaAngles(const kinova_msgs::msg::JointAngles &angles);
+   //  explicit KinovaAngles(const kinova_msgs::msg::JointAngles &angles);
     explicit KinovaAngles(const AngularInfo &angles);
 
-    kinova_msgs::msg::JointAngles constructAnglesMsg();
+   //  kinova_msgs::msg::JointAngles constructAnglesMsg();
     bool isCloseToOther(const KinovaAngles &, float tolerance) const;
     void applyShortestAngleDistanceTo(KinovaAngles target_angle);
 };
@@ -118,10 +113,10 @@ class FingerAngles : public FingersPosition
 {
  public:
     FingerAngles() {}
-    explicit FingerAngles(const kinova_msgs::msg::FingerPosition &position);
+   //  explicit FingerAngles(const kinova_msgs::msg::FingerPosition &position);
     explicit FingerAngles(const FingersPosition &angle);
 
-    kinova_msgs::msg::FingerPosition constructFingersMsg();
+   //  kinova_msgs::msg::FingerPosition constructFingersMsg();
     bool isCloseToOther(const FingerAngles &, float tolerance) const;
 };
 

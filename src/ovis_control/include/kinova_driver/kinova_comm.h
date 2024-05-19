@@ -51,6 +51,7 @@
 #include <kinova/KinovaTypes.h>
 
 #include <kinova_driver/kinova_ros_types.h>
+#include "hardware_interface/hardware_info.hpp"
 #include "kinova_driver/kinova_api.h"
 
 
@@ -60,10 +61,11 @@ namespace kinova
 class KinovaComm
 {
  public:
-    KinovaComm(const std::shared_ptr<rclcpp::Node> node_handle,
-             boost::recursive_mutex& api_mutex,
-             const bool is_movement_on_start,
-             const std::string & kinova_robotType);
+    KinovaComm(boost::recursive_mutex& api_mutex, 
+                    const hardware_interface::HardwareInfo& info);
+    KinovaComm(const KinovaComm&) = delete;
+    KinovaComm(KinovaComm&&) = default;
+
     ~KinovaComm();
 
     // %Tag(general functions)
