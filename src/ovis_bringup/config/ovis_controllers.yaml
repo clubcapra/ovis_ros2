@@ -5,6 +5,7 @@ controller_manager:
 
     ovis_controller:
       type: ovis_controller/OvisController
+      # type: joint_trajectory_controller/JointTrajectoryController
 
     joint_state_broadcaster:
       type: joint_state_broadcaster/JointStateBroadcaster
@@ -20,7 +21,7 @@ ovis_controller:
       - ovis_joint_6
     command_interfaces:
       - position
-      - velocity
+      # - velocity
     state_interfaces:
       - position
       - velocity

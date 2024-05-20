@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
     <xacro:macro name="ovis_ros2_control" params="name initial_positions_file">
-        <xacro:property name="initial_positions" value="${load_yaml(initial_positions_file)['initial_positions']}"/>
+        <xacro:property name="initial_positions" value="${xacro.load_yaml(initial_positions_file)['initial_positions']}"/>
 
         <ros2_control name="${name}" type="system">
             <hardware>
@@ -9,8 +9,9 @@
                 <!-- <plugin>mock_components/GenericSystem</plugin> -->
                 
                 <plugin>ovis_control/OvisHWInterface</plugin>
-                <param name="api_type">ETHERNET</param> <!-- USB or ETHERNET-->
-                <param name="local_machine_ip">192.168.84.15</param>
+                <param name="api_type">ETHERNET</param> 
+                <!-- USB or ETHERNET-->
+                <param name="local_machine_IP">192.168.84.15</param>
                 <param name="subnet_mask">255.255.255.0</param>
                 <param name="local_cmd_port">25015</param>
                 <param name="local_broadcast_port">25025</param>
@@ -21,42 +22,42 @@
             <joint name="ovis_joint_1">
                 <command_interface name="position"/>
                 <state_interface name="position">
-                  <param name="initial_value">${initial_positions['ovis_joint_1']}</param>
+                  <!-- <param name="initial_value">${initial_positions['ovis_joint_1']}</param> -->
                 </state_interface>
                 <state_interface name="velocity"/>
             </joint>
             <joint name="ovis_joint_2">
                 <command_interface name="position"/>
                 <state_interface name="position">
-                  <param name="initial_value">${initial_positions['ovis_joint_2']}</param>
+                  <!-- <param name="initial_value">${initial_positions['ovis_joint_2']}</param> -->
                 </state_interface>
                 <state_interface name="velocity"/>
             </joint>
             <joint name="ovis_joint_3">
                 <command_interface name="position"/>
                 <state_interface name="position">
-                  <param name="initial_value">${initial_positions['ovis_joint_3']}</param>
+                  <!-- <param name="initial_value">${initial_positions['ovis_joint_3']}</param> -->
                 </state_interface>
                 <state_interface name="velocity"/>
             </joint>
             <joint name="ovis_joint_4">
                 <command_interface name="position"/>
                 <state_interface name="position">
-                  <param name="initial_value">${initial_positions['ovis_joint_4']}</param>
+                  <!-- <param name="initial_value">${initial_positions['ovis_joint_4']}</param> -->
                 </state_interface>
                 <state_interface name="velocity"/>
             </joint>
             <joint name="ovis_joint_5">
                 <command_interface name="position"/>
                 <state_interface name="position">
-                  <param name="initial_value">${initial_positions['ovis_joint_5']}</param>
+                  <!-- <param name="initial_value">${initial_positions['ovis_joint_5']}</param> -->
                 </state_interface>
                 <state_interface name="velocity"/>
             </joint>
             <joint name="ovis_joint_6">
                 <command_interface name="position"/>
                 <state_interface name="position">
-                  <param name="initial_value">${initial_positions['ovis_joint_6']}</param>
+                  <!-- <param name="initial_value">${initial_positions['ovis_joint_6']}</param> -->
                 </state_interface>
                 <state_interface name="velocity"/>
             </joint>

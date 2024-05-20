@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 project(ovis_control LANGUAGES CXX)
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "(GNU|Clang)")
-  add_compile_options(-Wall -Wextra)
+  add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
 # find dependencies
@@ -13,6 +13,7 @@ set(THIS_PACKAGE_INCLUDE_DEPENDS
   rclcpp_lifecycle
   angles
   tf2
+  tf2_ros
 )
 
 # find dependencies
@@ -22,6 +23,12 @@ foreach(Dependency IN ITEMS ${THIS_PACKAGE_INCLUDE_DEPENDS})
 endforeach()
 
 ## COMPILE
+link_directories(${PROJECT_SOURCE_DIR}/lib/${CMAKE_LIBRARY_ARCHITECTURE})
+
+include_directories(
+  include
+)
+
 add_library(
   ovis_control
   SHARED
@@ -29,6 +36,13 @@ add_library(
   src/kinova_api.cpp
   src/kinova_comm.cpp
   src/kinova_ros_types.cpp
+  include/ovis_control/ovis_control.hpp
+  include/kinova_driver/kinova_api.h
+  include/kinova_driver/kinova_comm.h
+  include/kinova_driver/kinova_ros_types.h
+  include/kinova/Kinova.API.USBCommLayerUbuntu.h
+  include/kinova/Kinova.API.USBCommandLayerUbuntu.h
+  include/kinova/KinovaTypes.h
 )
 
 target_compile_features(ovis_control PUBLIC cxx_std_17)
@@ -48,12 +62,22 @@ ament_target_dependencies(
   include
 )
 
+# Install
 
 # prevent pluginlib from using boost
 target_compile_definitions(ovis_control PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNCTIONS")
 
 pluginlib_export_plugin_description_file(
   hardware_interface ovis_control.xml)
+
+# Copy over Kinova .so binary blobs to /usr/lib
+install(FILES
+  lib/${CMAKE_LIBRARY_ARCHITECTURE}/USBCommLayerUbuntu.so
+  lib/${CMAKE_LIBRARY_ARCHITECTURE}/USBCommandLayerUbuntu.so
+  lib/${CMAKE_LIBRARY_ARCHITECTURE}/EthCommLayerUbuntu.so
+  lib/${CMAKE_LIBRARY_ARCHITECTURE}/EthCommandLayerUbuntu.so
+  DESTINATION lib
+)
 
 install(
   DIRECTORY include/

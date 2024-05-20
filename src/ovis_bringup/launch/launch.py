@@ -23,16 +23,19 @@ from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 from launch_ros.parameter_descriptions import ParameterValue
 
-from moveit_configs_utils.launches import generate_moveit_rviz_launch, generate_spawn_controllers_launch, generate_move_group_launch
+from moveit_configs_utils.launches import generate_moveit_rviz_launch, generate_spawn_controllers_launch, generate_move_group_launch, generate_rsp_launch
 
 
 def generate_launch_description():
     # Get the launch directory
     pkg_ovis_description = get_package_share_directory('ovis_description')
     bringup_pkg_path = get_package_share_directory('ovis_bringup')
+    moveit_pkg_path = get_package_share_directory('ovis_moveit')
 
     # Get the URDF file
-    urdf_path = os.path.join(pkg_ovis_description, 'urdf', 'ovis_standalone.urdf.xacro')
+    # urdf_path = os.path.join(pkg_ovis_description, 'urdf', 'ovis_standalone.urdf.xacro')
+    # robot_desc = ParameterValue(Command(['xacro ', urdf_path]), value_type=str)
+    urdf_path = os.path.join(moveit_pkg_path, 'config', 'ovis.urdf.xacro')
     robot_desc = ParameterValue(Command(['xacro ', urdf_path]), value_type=str)
 
     # robot_controllers = PathJoinSubstitution(
@@ -43,21 +46,28 @@ def generate_launch_description():
     #     ]
     # )
     
+    # robot_controllers = PathJoinSubstitution(
+    #     [
+    #         FindPackageShare("ovis_moveit"),
+    #         "config",
+    #         "ovis_controllers.yaml",
+    #     ]
+    # )
+    
     robot_controllers = PathJoinSubstitution(
         [
-            FindPackageShare("ovis_moveit"),
+            FindPackageShare("ovis_bringup"),
             "config",
             "ovis_controllers.yaml",
         ]
     )
-
-    
     
     control_node = Node(
         package="controller_manager",
         executable="ros2_control_node",
         parameters=[robot_controllers],
         remappings=[
+            ("~/robot_description", "/robot_description"),
             (
                 "/forward_position_controller/commands",
                 "/position_commands",
@@ -71,12 +81,14 @@ def generate_launch_description():
         package='robot_state_publisher',
         executable='robot_state_publisher',
         name='robot_state_publisher',
-        output='both',
+        respawn=True,
+        output='screen',
         parameters=[
             {'robot_description': robot_desc},
             # {"use_sim_time": True, }
         ]
     )
+    # robot_state_pub_node = generate_rsp_launch()
     # Visualize in RViz
     rviz_node = Node(
        package='rviz2',
