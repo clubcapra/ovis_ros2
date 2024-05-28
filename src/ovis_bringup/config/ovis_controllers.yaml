@@ -3,14 +3,14 @@ controller_manager:
   ros__parameters:
     update_rate: 100  # Hz
 
-    ovis_controller:
-      type: ovis_controller/OvisController
-      # type: joint_trajectory_controller/JointTrajectoryController
+    arm_controller:
+      # type: ovis_controller/OvisController
+      type: joint_trajectory_controller/JointTrajectoryController
 
     joint_state_broadcaster:
       type: joint_state_broadcaster/JointStateBroadcaster
 
-ovis_controller:
+arm_controller:
   ros__parameters:
     joints:
       - ovis_joint_1
@@ -21,7 +21,7 @@ ovis_controller:
       - ovis_joint_6
     command_interfaces:
       - position
-      # - velocity
+      - velocity
     state_interfaces:
       - position
       - velocity

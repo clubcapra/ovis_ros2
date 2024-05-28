@@ -30,9 +30,9 @@
 #include "kinova_driver/kinova_api.h"
 #include "kinova_driver/kinova_comm.h"
 
-
 namespace ovis_control
 {
+
 class OvisHWInterface : public hardware_interface::SystemInterface
 {
 public:
@@ -66,9 +66,22 @@ public:
   hardware_interface::return_type write(
     const rclcpp::Time & time, const rclcpp::Duration & period) override;
 
+  // TEMPLATES__ROS2_CONTROL__VISIBILITY_PUBLIC 
+  // hardware_interface::return_type prepare_command_mode_switch(
+  //   const std::vector<std::string> & start_interfaces,
+  //   const std::vector<std::string> & stop_interfaces) override;
+
   virtual ~OvisHWInterface();
 
 private:
+  enum integration_level_t : std::uint8_t
+  {
+    UNDEFINED = 0,
+    POSITION,
+    VELOCITY,
+    TORQUE,
+  };
+
   std::vector<double> hw_position_commands_;
   std::vector<double> hw_position_states_;
   std::vector<double> hw_position_init_;
@@ -81,6 +94,9 @@ private:
   kinova::KinovaComm* comm = nullptr;
   boost::recursive_mutex mApiMutex{};
   volatile bool isActive = false;
+
+
+  integration_level_t control_level_;
 
   const rclcpp::Logger logger() const;
 };

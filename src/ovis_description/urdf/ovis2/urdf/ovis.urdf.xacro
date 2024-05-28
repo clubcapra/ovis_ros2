@@ -2,13 +2,13 @@
 <root xmlns:xacro="http://www.ros.org/wiki/xacro">
 
 
-    <xacro:property name="link_base_mesh" value="visual/ovis_base" />
-    <xacro:property name="link_1_mesh" value="visual/ovis_shoulder" />
-    <xacro:property name="link_2_mesh" value="visual/ovis_upper_arm" />
-    <xacro:property name="link_3_mesh" value="visual/ovis_elbow" />
-    <xacro:property name="link_4_mesh" value="visual/ovis_forearm" />
-    <xacro:property name="link_5_mesh" value="visual/ovis_wrist" />
-    <xacro:property name="link_6_mesh" value="visual/ovis_flange" />
+    <xacro:property name="link_base_mesh" value="ovis_base" />
+    <xacro:property name="link_1_mesh" value="ovis_j12" />
+    <xacro:property name="link_2_mesh" value="ovis_j23" />
+    <xacro:property name="link_3_mesh" value="ovis_j34" />
+    <xacro:property name="link_4_mesh" value="ovis_j45" />
+    <xacro:property name="link_5_mesh" value="ovis_j56" />
+    <xacro:property name="link_6_mesh" value="ovis_end_effector" />
 
     <xacro:property name="link_base_mesh_no" value="0" />
     <xacro:property name="link_1_mesh_no" value="1" />
@@ -23,13 +23,13 @@
     <xacro:property name="joint_base_axis_xyz" value="0 0 0" />
     <!-- Transferred to a parameter in the ovis macro -->
     <!-- <xacro:property name="joint_base_origin_xyz" value="0 0 0" /> -->
-    <xacro:property name="joint_base_origin_rpy" value="${J_PI/2} 0 0" />
+    <xacro:property name="joint_base_origin_rpy" value="0 0 0" />
 
 
     <xacro:property name="joint_1" value="joint_1" />
     <xacro:property name="joint_1_type" value="continuous" />
-    <xacro:property name="joint_1_axis_xyz" value="0 1 0" />
-    <xacro:property name="joint_1_origin_xyz" value="0 0.051 0" />
+    <xacro:property name="joint_1_axis_xyz" value="0 0 1" />
+    <xacro:property name="joint_1_origin_xyz" value="0 0 0.03" />
     <xacro:property name="joint_1_origin_rpy" value="0 0 0" />
     <xacro:property name="joint_1_lower_limit" value="${-4*J_PI}" />
     <xacro:property name="joint_1_upper_limit" value="${4*J_PI}" />
@@ -38,28 +38,28 @@
 
     <xacro:property name="joint_2" value="joint_2" />
     <xacro:property name="joint_2_type" value="revolute" />
-    <xacro:property name="joint_2_axis_xyz" value="0 0 1" />
-    <xacro:property name="joint_2_origin_xyz" value="0 0.0889 0" />
-    <xacro:property name="joint_2_origin_rpy" value="0 0 ${-J_PI/2}" />
-    <xacro:property name="joint_2_lower_limit" value="0" />
-    <xacro:property name="joint_2_upper_limit" value="${J_PI}" />
+    <xacro:property name="joint_2_axis_xyz" value="0 1 0" />
+    <xacro:property name="joint_2_origin_xyz" value="0.00004 0.0625 0.07001" />
+    <xacro:property name="joint_2_origin_rpy" value="0 0 0" />
+    <xacro:property name="joint_2_lower_limit" value="-3.40339" />
+    <xacro:property name="joint_2_upper_limit" value="0.26180" />
     <xacro:property name="joint_2_velocity_limit" value="${36*J_PI/180}" />
     <xacro:property name="joint_2_torque_limit" value="80" />
 
     <xacro:property name="joint_3" value="joint_3" />
     <xacro:property name="joint_3_type" value="revolute" />
-    <xacro:property name="joint_3_axis_xyz" value="0 0 1" />
-    <xacro:property name="joint_3_origin_xyz" value="0 0.465 0" />
-    <xacro:property name="joint_3_origin_rpy" value="0 0 ${J_PI}" />
-    <xacro:property name="joint_3_lower_limit" value="${-J_PI}" />
+    <xacro:property name="joint_3_axis_xyz" value="0 -1 0" />
+    <xacro:property name="joint_3_origin_xyz" value="0.30039 -0.01763 0.00072" />
+    <xacro:property name="joint_3_origin_rpy" value="0 0 0" />
+    <xacro:property name="joint_3_lower_limit" value="-5.23599" />
     <xacro:property name="joint_3_upper_limit" value="0" />
     <xacro:property name="joint_3_velocity_limit" value="${36*J_PI/180}" />
     <xacro:property name="joint_3_torque_limit" value="40" />
 
     <xacro:property name="joint_4" value="joint_4" />
     <xacro:property name="joint_4_type" value="continuous" />
-    <xacro:property name="joint_4_axis_xyz" value="0 1 0" />
-    <xacro:property name="joint_4_origin_xyz" value="0.0889 0.047625 0" />
+    <xacro:property name="joint_4_axis_xyz" value="-1 0 0" />
+    <xacro:property name="joint_4_origin_xyz" value="-0.06672 -0.04897 -0.00044" />
     <xacro:property name="joint_4_origin_rpy" value="0 0 0" />
     <xacro:property name="joint_4_lower_limit" value="${-4*J_PI}" />
     <xacro:property name="joint_4_upper_limit" value="${4*J_PI}" />
@@ -68,19 +68,19 @@
 
     <xacro:property name="joint_5" value="joint_5" />
     <xacro:property name="joint_5_type" value="revolute" />
-    <xacro:property name="joint_5_axis_xyz" value="0 0 1" />
-    <xacro:property name="joint_5_origin_xyz" value="0 0.265 0" />
+    <xacro:property name="joint_5_axis_xyz" value="0 1 0" />
+    <xacro:property name="joint_5_origin_xyz" value="-0.33480 0.00015 0.00051" />
     <xacro:property name="joint_5_origin_rpy" value="0 0 0" />
-    <xacro:property name="joint_5_lower_limit" value="${-J_PI/2}" />
-    <xacro:property name="joint_5_upper_limit" value="${J_PI/2}" />
+    <xacro:property name="joint_5_lower_limit" value="-1.65806" />
+    <xacro:property name="joint_5_upper_limit" value="1.65806" />
     <xacro:property name="joint_5_velocity_limit" value="${48*J_PI/180}" />
     <xacro:property name="joint_5_torque_limit" value="20" />
 
     <xacro:property name="joint_6" value="joint_6" />
     <xacro:property name="joint_6_type" value="continuous" />
-    <xacro:property name="joint_6_axis_xyz" value="0 0 1" />
-    <xacro:property name="joint_6_origin_xyz" value="0 0.0762 0" />
-    <xacro:property name="joint_6_origin_rpy" value="${J_PI/2} ${J_PI/2} 0" />
+    <xacro:property name="joint_6_axis_xyz" value="-1 0 0" />
+    <xacro:property name="joint_6_origin_xyz" value="-0.07 0.00003 0.00001" />
+    <xacro:property name="joint_6_origin_rpy" value="0 0 0" />
     <!-- If gripper inverted, use this line instead -->
     <!-- <xacro:property name="joint_6_origin_rpy" value="$${-J_PI/3} 0 0" /> -->
     <xacro:property name="joint_6_lower_limit" value="${-2*J_PI}" />
@@ -95,8 +95,7 @@
     <xacro:property name="joint_end_effector_origin_rpy" value="${J_PI} 0 ${J_PI/2}" />
 
 
-    <xacro:macro name="ovis" params="base_parent type:=ovis prefix:=ovis joint_base_origin_xyz:='0 0 0'">
-
+    <xacro:macro name="ovis" params="base_parent prefix:=ovis joint_base_origin_xyz:='0 0 0'">
 
         <xacro:gazebo_config robot_namespace="${prefix}" />
 
