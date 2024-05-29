@@ -16,6 +16,7 @@
 #include <vector>
 
 #include "ovis_control/ovis_control.hpp"
+#include <math.h>
 #include "hardware_interface/types/hardware_interface_type_values.hpp"
 #include "rclcpp/rclcpp.hpp"
 
@@ -23,6 +24,17 @@ using namespace std::chrono;
 
 namespace ovis_control
 {
+
+    double rad2deg(double rad)
+    {
+        return rad / (M_PI / 180);
+    }
+
+    double deg2rad(double deg)
+    {
+        return deg * (M_PI / 180);
+    }
+
     hardware_interface::CallbackReturn OvisHWInterface::on_init(
         const hardware_interface::HardwareInfo &info)
     {
@@ -33,7 +45,7 @@ namespace ovis_control
         }
         hw_position_commands_.resize(info_.joints.size(), 0);
         hw_position_states_.resize(info_.joints.size(), 0);
-        hw_position_init_.resize(info_.joints.size(), 0);
+        // hw_position_init_.resize(info_.joints.size(), 0);
         hw_velocity_commands_.resize(info_.joints.size(), 0);
         hw_velocity_states_.resize(info_.joints.size(), 0);
         hw_effort_commands_.resize(info_.joints.size(), 0);
@@ -55,14 +67,13 @@ namespace ovis_control
         return CallbackReturn::SUCCESS;
     }
 
-    hardware_interface::CallbackReturn OvisHWInterface::on_configure(
-        const rclcpp_lifecycle::State & /*previous_state*/)
-    {
+    
+TEMPLATES__ROS2_CONTROL__VISIBILITY_PUBLIC hardware_interface::CallbackReturn OvisHWInterface::on_configure(const rclcpp_lifecycle::State & previous_state)
+{
+    return hardware_interface::CallbackReturn::SUCCESS;
+}
 
-        return CallbackReturn::SUCCESS;
-    }
-
-    std::vector<hardware_interface::StateInterface> OvisHWInterface::export_state_interfaces()
+TEMPLATES__ROS2_CONTROL__VISIBILITY_PUBLIC std::vector<hardware_interface::StateInterface> OvisHWInterface::export_state_interfaces()
     {
         std::vector<hardware_interface::StateInterface> state_interfaces;
         for (size_t i = 0; i < info_.joints.size(); ++i)
@@ -99,14 +110,14 @@ namespace ovis_control
         for (size_t i = 0; i < info_.joints.size(); ++i)
         {
             command_interfaces.emplace_back(hardware_interface::CommandInterface(
-                info_.joints[i].name, hardware_interface::HW_IF_POSITION, &hw_position_states_[i]));
+                info_.joints[i].name, hardware_interface::HW_IF_POSITION, &hw_position_commands_[i]));
         }
 
-        for (size_t i = 0; i < info_.joints.size(); ++i)
-        {
-            command_interfaces.emplace_back(hardware_interface::CommandInterface(
-                info_.joints[i].name, hardware_interface::HW_IF_VELOCITY, &hw_velocity_states_[i]));
-        }
+        // for (size_t i = 0; i < info_.joints.size(); ++i)
+        // {
+        //     command_interfaces.emplace_back(hardware_interface::CommandInterface(
+        //         info_.joints[i].name, hardware_interface::HW_IF_VELOCITY, &hw_velocity_commands_[i]));
+        // }
 
         // for (size_t i = 0; i < info_.joints.size(); ++i)
         // {
@@ -144,8 +155,9 @@ namespace ovis_control
         comm->getJointAngles(angles);
         for (size_t i = 0; i < info_.joints.size(); ++i)
         {
-            hw_position_init_.at(i) = (double)angles[i];
+            // hw_position_init_.at(i) = -(double)angles[i];
         }
+        // hw_position_init_.resize(info_.joints.size(), 0);
         return CallbackReturn::SUCCESS;
     }
 
@@ -165,7 +177,10 @@ namespace ovis_control
     {
         static rclcpp::Clock clk = rclcpp::Clock();
         if (!isActive)
-            return hardware_interface::return_type::ERROR;
+        {
+            // RCLCPP_WARN_THROTTLE()
+            return hardware_interface::return_type::OK;
+        }
         kinova::KinovaAngles angles;
         try
         {
@@ -175,13 +190,15 @@ namespace ovis_control
 
             for (size_t i = 0; i < info_.joints.size(); ++i)
             {
-                hw_position_states_.at(i) = (double)angles[i] - hw_position_init_.at(i);
+                
+                hw_position_states_.at(i) = -deg2rad((double)angles[i] - hw_position_init_.at(i)) * hw_position_invert_.at(i);
+                // hw_position_states_.at(i) = -deg2rad((double)angles[i]);
             }
-
+            RCLCPP_INFO_STREAM_THROTTLE(rclcpp::get_logger(get_name()), clk, 1000, "Offset angles at" << "\n1:" << hw_position_states_[0] << "\n2:" << hw_position_states_[1] << "\n3:" << hw_position_states_[2] << "\n4:" << hw_position_states_[3] << "\n5:" << hw_position_states_[4] << "\n6:" << hw_position_states_[5]);
             comm->getJointVelocities(angles);
             for (size_t i = 0; i < info_.joints.size(); ++i)
             {
-                hw_velocity_states_.at(i) = (double)angles[i];
+                hw_velocity_states_.at(i) = -deg2rad((double)angles[i]);
             }
 
             // comm->getJointTorques(angles);
@@ -201,8 +218,9 @@ namespace ovis_control
     hardware_interface::return_type OvisHWInterface::write(
         const rclcpp::Time & /*time*/, const rclcpp::Duration & /*period*/)
     {
+        static rclcpp::Clock clk = rclcpp::Clock();
         if (!isActive)
-            return hardware_interface::return_type::ERROR;
+            return hardware_interface::return_type::OK;
         kinova::KinovaAngles angles;
         try
         {
@@ -211,32 +229,29 @@ namespace ovis_control
                 switch (control_level_)
                 {
                 case POSITION:
-                        angles[i] = (float)hw_position_commands_.at(i) + hw_position_init_.at(i);
+                        RCLCPP_INFO_STREAM_THROTTLE(rclcpp::get_logger(get_name()), clk, 1000, "Offset angles to" << "\n1:" << hw_position_states_[0] << "\n2:" << hw_position_states_[1] << "\n3:" << hw_position_states_[2] << "\n4:" << hw_position_states_[3] << "\n5:" << hw_position_states_[4] << "\n6:" << hw_position_states_[5]);
+                        angles[i] = (float)(rad2deg(hw_position_commands_.at(i)) * hw_position_invert_.at(i) + hw_position_init_.at(i));
+                        // angles[i] = -(float)(rad2deg(hw_position_commands_.at(i)));
+                        RCLCPP_INFO_STREAM_THROTTLE(rclcpp::get_logger(get_name()), clk, 1000, "Angles to" << "\n1:" << angles.Actuator1 << "\n2:" << angles.Actuator2 << "\n3:" << angles.Actuator3 << "\n4:" << angles.Actuator4 << "\n5:" << angles.Actuator5 << "\n6:" << angles.Actuator6);
                     break;
                 case VELOCITY:
-                        angles[i] = (float)hw_velocity_commands_.at(i);
+                        angles[i] = -(float)rad2deg(hw_velocity_commands_.at(i));
                     break;
                 default:
+                    RCLCPP_ERROR(logger(), "Invalid control level");
                     return hardware_interface::return_type::ERROR;
                 }
             }
-
-            // RCLCPP_INFO_STREAM(rclcpp::get_logger(get_name()), "Setting angles to" <<
-            //     "\n1:" << angles.Actuator1 <<
-            //     "\n2:" << angles.Actuator2 <<
-            //     "\n3:" << angles.Actuator3 <<
-            //     "\n4:" << angles.Actuator4 <<
-            //     "\n5:" << angles.Actuator5 <<
-            //     "\n6:" << angles.Actuator6);
             switch (control_level_)
             {
             case POSITION:
-                    comm->setJointAngles(angles);
+                    // comm->setJointAngles(angles);
                 break;
             case VELOCITY:
-                    comm->setJointVelocities(angles);
+                    // comm->setJointVelocities(angles);
                 break;
             default:
+                RCLCPP_ERROR(logger(), "Invalid control level");
                 return hardware_interface::return_type::ERROR;
             }
             // RCLCPP_INFO(logger(), "Angles set!");
@@ -250,53 +265,53 @@ namespace ovis_control
         return hardware_interface::return_type::OK;
     }
 
-    // hardware_interface::return_type OvisHWInterface::prepare_command_mode_switch(
-    //     const std::vector<std::string> &start_interfaces,
-    //     const std::vector<std::string> &stop_interfaces)
-    // {
-    //     // Prepare for new command modes
-    //     // std::vector<integration_level_t> new_modes = {};
-    //     // for (std::string key : start_interfaces)
-    //     // {
-    //     //     for (std::size_t i = 0; i < info_.joints.size(); i++)
-    //     //     {
-    //     //         if (key == info_.joints[i].name + "/" + hardware_interface::HW_IF_POSITION)
-    //     //         {
-    //     //             new_modes.push_back(integration_level_t::POSITION);
-    //     //         }
-    //     //         if (key == info_.joints[i].name + "/" + hardware_interface::HW_IF_VELOCITY)
-    //     //         {
-    //     //             new_modes.push_back(integration_level_t::VELOCITY);
-    //     //         }
-    //     //         // if (key == info_.joints[i].name + "/" + hardware_interface::HW_IF_ACCELERATION)
-    //     //         // {
-    //     //         //     new_modes.push_back(integration_level_t::ACCELERATION);
-    //     //         // }
-    //     //     }
-    //     // }
-    //     // Stop motion on all relevant joints that are stopping
-    //     // for (std::string key : stop_interfaces)
-    //     // {
-    //     //     for (std::size_t i = 0; i < info_.joints.size(); i++)
-    //     //     {
-    //     //         if (key.find(info_.joints[i].name) != std::string::npos)
-    //     //         {
-    //     //             hw_velocity_commands_[i] = 0;
-    //     //             // control_level_ = integration_level_t::UNDEFINED; // Revert to undefined
-    //     //         }
-    //     //     }
-    //     // }
-    //     std::string key = start_interfaces[0];
-    //     if (key == info_.joints[0].name + "/" + hardware_interface::HW_IF_POSITION)
-    //     {
-    //         control_level_ = integration_level_t::POSITION;
-    //     }
-    //     if (key == info_.joints[0].name + "/" + hardware_interface::HW_IF_VELOCITY)
-    //     {
-    //         control_level_ =  integration_level_t::VELOCITY;
-    //     }
-    //     return hardware_interface::return_type::OK;
-    // }
+    hardware_interface::return_type OvisHWInterface::prepare_command_mode_switch(
+        const std::vector<std::string> &start_interfaces,
+        const std::vector<std::string> &stop_interfaces)
+    {
+        // Prepare for new command modes
+        // std::vector<integration_level_t> new_modes = {};
+        // for (std::string key : start_interfaces)
+        // {
+        //     for (std::size_t i = 0; i < info_.joints.size(); i++)
+        //     {
+        //         if (key == info_.joints[i].name + "/" + hardware_interface::HW_IF_POSITION)
+        //         {
+        //             new_modes.push_back(integration_level_t::POSITION);
+        //         }
+        //         if (key == info_.joints[i].name + "/" + hardware_interface::HW_IF_VELOCITY)
+        //         {
+        //             new_modes.push_back(integration_level_t::VELOCITY);
+        //         }
+        //         // if (key == info_.joints[i].name + "/" + hardware_interface::HW_IF_ACCELERATION)
+        //         // {
+        //         //     new_modes.push_back(integration_level_t::ACCELERATION);
+        //         // }
+        //     }
+        // }
+        // Stop motion on all relevant joints that are stopping
+        // for (std::string key : stop_interfaces)
+        // {
+        //     for (std::size_t i = 0; i < info_.joints.size(); i++)
+        //     {
+        //         if (key.find(info_.joints[i].name) != std::string::npos)
+        //         {
+        //             hw_velocity_commands_[i] = 0;
+        //             // control_level_ = integration_level_t::UNDEFINED; // Revert to undefined
+        //         }
+        //     }
+        // }
+        std::string key = start_interfaces[0];
+        if (key == info_.joints[0].name + "/" + hardware_interface::HW_IF_POSITION)
+        {
+            control_level_ = integration_level_t::POSITION;
+        }
+        if (key == info_.joints[0].name + "/" + hardware_interface::HW_IF_VELOCITY)
+        {
+            control_level_ =  integration_level_t::VELOCITY;
+        }
+        return hardware_interface::return_type::OK;
+    }
 
     OvisHWInterface::~OvisHWInterface()
     {

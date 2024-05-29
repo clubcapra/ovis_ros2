@@ -66,10 +66,10 @@ public:
   hardware_interface::return_type write(
     const rclcpp::Time & time, const rclcpp::Duration & period) override;
 
-  // TEMPLATES__ROS2_CONTROL__VISIBILITY_PUBLIC 
-  // hardware_interface::return_type prepare_command_mode_switch(
-  //   const std::vector<std::string> & start_interfaces,
-  //   const std::vector<std::string> & stop_interfaces) override;
+  TEMPLATES__ROS2_CONTROL__VISIBILITY_PUBLIC 
+  hardware_interface::return_type prepare_command_mode_switch(
+    const std::vector<std::string> & start_interfaces,
+    const std::vector<std::string> & stop_interfaces) override;
 
   virtual ~OvisHWInterface();
 
@@ -84,7 +84,8 @@ private:
 
   std::vector<double> hw_position_commands_;
   std::vector<double> hw_position_states_;
-  std::vector<double> hw_position_init_;
+  std::vector<double> hw_position_init_{211.158, 44.625, 7.11807, 299.97, 181.432, 0};
+  std::vector<double> hw_position_invert_{-1, 1, 1, 1, 1, 1};
   std::vector<double> hw_velocity_commands_;
   std::vector<double> hw_velocity_states_;
   std::vector<double> hw_effort_commands_;
@@ -96,7 +97,7 @@ private:
   volatile bool isActive = false;
 
 
-  integration_level_t control_level_;
+  integration_level_t control_level_ = integration_level_t::POSITION;
 
   const rclcpp::Logger logger() const;
 };
