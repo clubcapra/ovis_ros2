@@ -34,5 +34,5 @@ ros2 launch ovis_moveit demo.launch.py
 
 Launch Joystick control with Moveit! and Servo :
 ```bash
-os2 launch ovis_bringup combined.launch.py
+ros2 launch ovis_bringup combined.launch.py
 ```
