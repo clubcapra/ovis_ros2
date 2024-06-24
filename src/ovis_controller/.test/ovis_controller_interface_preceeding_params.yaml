@@ -1,9 +1,0 @@
-test_ovis_controller_interface:
-  ros__parameters:
-    joints:
-      - joint1
-
-    interface_name: acceleration
-
-    state_joints:
-      - joint1state

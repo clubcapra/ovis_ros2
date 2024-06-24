@@ -39,14 +39,15 @@ def generate_launch_description():
                                      'basic.rviz')],
     )
 
-    teleop = IncludeLaunchDescription(
+     # Include MoveIt configuration
+    moveit = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(bringup_pkg_path, "launch", "ovis_controller_usb.launch.py"),
+            os.path.join(get_package_share_directory('ovis_moveit'), 'launch', 'demo.launch.py')
         ),
     )
 
     return LaunchDescription([
             robot_state_publisher,
             rviz,
-            teleop,
+            moveit,
             ])

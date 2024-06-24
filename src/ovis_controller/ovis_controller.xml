@@ -1,8 +1,0 @@
-<library path="ovis_controller">
-  <class name="ovis_controller/OvisController"
-         type="ovis_controller::OvisController" base_class_type="controller_interface::ControllerInterface">
-  <description>
-    OvisController ros2_control controller.
-  </description>
-  </class>
-</library>
