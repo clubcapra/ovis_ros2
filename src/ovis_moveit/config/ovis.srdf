@@ -31,4 +31,28 @@
     </group_state>
     <!--VIRTUAL JOINT: Purpose: this element defines a virtual joint between a robot link and an external frame of reference (considered fixed with respect to the robot)-->
     <virtual_joint name="virtual_joint" type="fixed" parent_frame="world" child_link="base_link"/>
+
+    <!-- Disable collisions between all links -->
+    <disable_collisions link1="ovis_base_link" link2="ovis_link_1" reason="All links collision disabled"/>
+    <disable_collisions link1="ovis_base_link" link2="ovis_link_2" reason="All links collision disabled"/>
+    <disable_collisions link1="ovis_base_link" link2="ovis_link_3" reason="All links collision disabled"/>
+    <disable_collisions link1="ovis_base_link" link2="ovis_link_4" reason="All links collision disabled"/>
+    <disable_collisions link1="ovis_base_link" link2="ovis_link_5" reason="All links collision disabled"/>
+    <disable_collisions link1="ovis_base_link" link2="ovis_link_6" reason="All links collision disabled"/>
+    <disable_collisions link1="ovis_link_1" link2="ovis_link_2" reason="All links collision disabled"/>
+    <disable_collisions link1="ovis_link_1" link2="ovis_link_3" reason="All links collision disabled"/>
+    <disable_collisions link1="ovis_link_1" link2="ovis_link_4" reason="All links collision disabled"/>
+    <disable_collisions link1="ovis_link_1" link2="ovis_link_5" reason="All links collision disabled"/>
+    <disable_collisions link1="ovis_link_1" link2="ovis_link_6" reason="All links collision disabled"/>
+    <disable_collisions link1="ovis_link_2" link2="ovis_link_3" reason="All links collision disabled"/>
+    <disable_collisions link1="ovis_link_2" link2="ovis_link_4" reason="All links collision disabled"/>
+    <disable_collisions link1="ovis_link_2" link2="ovis_link_5" reason="All links collision disabled"/>
+    <disable_collisions link1="ovis_link_2" link2="ovis_link_6" reason="All links collision disabled"/>
+    <disable_collisions link1="ovis_link_3" link2="ovis_link_4" reason="All links collision disabled"/>
+    <disable_collisions link1="ovis_link_3" link2="ovis_link_5" reason="All links collision disabled"/>
+    <disable_collisions link1="ovis_link_3" link2="ovis_link_6" reason="All links collision disabled"/>
+    <disable_collisions link1="ovis_link_4" link2="ovis_link_5" reason="All links collision disabled"/>
+    <disable_collisions link1="ovis_link_4" link2="ovis_link_6" reason="All links collision disabled"/>
+    <disable_collisions link1="ovis_link_5" link2="ovis_link_6" reason="All links collision disabled"/>
+
 </robot>

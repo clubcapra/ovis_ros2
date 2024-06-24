@@ -18,14 +18,14 @@
 <!-- <xacro:include filename="$(find ovis_description)/urdf/kinova_inertial.xacro" /> -->
 
 
+
     <xacro:property name="J_PI" value="3.1415926535897931" />
 
     <xacro:macro name="kinova_armlink" params="link_name link_mesh ring_mesh:=ring_big use_ring_mesh:=false mesh_no">
         <link name="${link_name}">
             <visual name="${link_name}_vis">
                 <geometry>
-                    <mesh
-                        filename="file://$(find ovis_description)/urdf/ovis2/meshes/visual/${link_mesh}.stl"/>
+                    <mesh filename="package://ovis_description/urdf/ovis2/meshes/visual/${link_mesh}.stl"/>
                 </geometry>
                 <material name="carbon_fiber">
                     <color rgba="0.792156862745098 0 0 1" />
@@ -33,17 +33,15 @@
             </visual>
             <collision name="${link_name}_col">
                 <geometry>
-                    <mesh
-                        filename="$(find ovis_description)/urdf/ovis2/meshes/collision/${link_mesh}.stl"/>
+                    <mesh filename="package://ovis_description/urdf/ovis2/meshes/collision/${link_mesh}.stl"/>
                 </geometry>
             </collision>
-						<inertial>
-              <inertia ixx="0.00001" ixy="0.00000" ixz="0.00000" iyy="0.00001" iyz="0.00000" izz="0.00001"/>
-              <origin rpy="0.00000 0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
-              <mass value="0.1"/>
+            <inertial>
+                <inertia ixx="0.00001" ixy="0.00000" ixz="0.00000" iyy="0.00001" iyz="0.00000" izz="0.00001"/>
+                <origin rpy="0.00000 0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+                <mass value="0.1"/>
             </inertial>
-      </link>
-
+        </link>
     </xacro:macro>
 
   <!--

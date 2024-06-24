@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>realtime_servo</name>
+  <name>ovis_realtime_servo</name>
   <version>2.5.5</version>
   <description>Provides real-time manipulator Cartesian and joint servoing.</description>
   <maintainer email="blakeanderson@utexas.edu">Blake Anderson</maintainer>

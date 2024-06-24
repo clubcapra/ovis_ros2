@@ -58,7 +58,7 @@ def generate_launch_description():
         executable="component_container_mt",
         composable_node_descriptions=[
             ComposableNode(
-                package="moveit_servo",
+                package="ovis_moveit_servo",
                 plugin="moveit_servo::JoyToServoPub",
                 name="controller_to_servo_node",
             ),
@@ -73,7 +73,7 @@ def generate_launch_description():
     # Launch a standalone Servo node.
     # As opposed to a node component, this may be necessary (for example) if Servo is running on a different PC
     servo_node = Node(
-        package="moveit_servo",
+        package="ovis_moveit_servo",
         executable="servo_node_main",
         parameters=[
             servo_params,

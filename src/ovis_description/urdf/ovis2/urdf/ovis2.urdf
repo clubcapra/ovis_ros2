@@ -43,156 +43,165 @@
     <child link="ovis2_link_6"/>
     <axis xyz="-1.00000 0.00000 0.00000"/>
   </joint>
+  
+ <!-- Base link -->
   <link name="ovis2_base_link">
     <collision name="ovis2_base_col">
-      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="../meshes/stl/Low res ovis.025.stl" scale="1.00000 1.00000 1.00000"/>
+        <mesh filename="package://ovis_description/urdf/ovis2/meshes/collision/ovis_base.stl" scale="1 1 1"/>
       </geometry>
     </collision>
     <inertial>
-      <inertia ixx="0.00001" ixy="0.00000" ixz="0.00000" iyy="0.00001" iyz="0.00000" izz="0.00001"/>
-      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+      <inertia ixx="0.00001" ixy="0" ixz="0" iyy="0.00001" iyz="0" izz="0.00001"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <mass value="0.00001"/>
     </inertial>
-    <sensor name="ovis2_base_6dof" type="force_torque">
-      <parent link="ovis2_base_link"/>
-      <force_torque>
-        <frame>ovis2_base_link</frame>
-      </force_torque>
-    </sensor>
     <visual name="ovis2_base_vis">
-      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00000 0.00000 -0.00000"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <material name="Opaque(128,128,128)"/>
       <geometry>
-        <mesh filename="../meshes/stl/Low res ovis.011.stl" scale="1.00000 1.00000 1.00000"/>
+        <mesh filename="package://ovis_description/urdf/ovis2/meshes/collision/ovis_base.stl" scale="1 1 1"/>
       </geometry>
     </visual>
   </link>
+  
+  <!-- Link 1 -->
   <link name="ovis2_link_1">
     <collision name="ovis2_j12_col">
-      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="../meshes/stl/Low res ovis.026.stl" scale="1.00000 1.00000 1.00000"/>
+        <mesh filename="package://ovis_description/urdf/ovis2/meshes/collision/ovis_j12.stl" scale="1 1 1"/>
       </geometry>
     </collision>
     <inertial>
-      <inertia ixx="0.00001" ixy="0.00000" ixz="0.00000" iyy="0.00001" iyz="0.00000" izz="0.00001"/>
-      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+      <inertia ixx="0.00001" ixy="0" ixz="0" iyy="0.00001" iyz="0" izz="0.00001"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <mass value="0.00001"/>
     </inertial>
     <visual name="ovis2_j12_vis">
-      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00000 0.00000 -0.00000"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <material name="Opaque(128,128,128)"/>
       <geometry>
-        <mesh filename="../meshes/stl/Low res ovis.019.stl" scale="1.00000 1.00000 1.00000"/>
+        <mesh filename="package://ovis_description/urdf/ovis2/meshes/collision/ovis_j12.stl" scale="1 1 1"/>
       </geometry>
     </visual>
   </link>
+  
+  <!-- Link 2 -->
   <link name="ovis2_link_2">
     <collision name="ovis2_j23_col">
-      <origin rpy="0.00000 0.00000 0.00000" xyz="-0.00000 -0.00000 0.00000"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="../meshes/stl/Low res ovis.028.stl" scale="1.00000 1.00000 1.00000"/>
+        <mesh filename="package://ovis_description/urdf/ovis2/meshes/collision/ovis_j23.stl" scale="1 1 1"/>
       </geometry>
     </collision>
     <inertial>
-      <inertia ixx="0.00001" ixy="0.00000" ixz="0.00000" iyy="0.00001" iyz="0.00000" izz="0.00001"/>
-      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+      <inertia ixx="0.00001" ixy="0" ixz="0" iyy="0.00001" iyz="0" izz="0.00001"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <mass value="0.00001"/>
     </inertial>
     <visual name="ovis2_j23_vis">
-      <origin rpy="0.00000 0.00000 0.00000" xyz="-0.00000 0.00000 0.00000"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <material name="Aluminum_-_Satin"/>
       <geometry>
-        <mesh filename="../meshes/stl/Low res ovis.020.stl" scale="1.00000 1.00000 1.00000"/>
+        <mesh filename="package://ovis_description/urdf/ovis2/meshes/collision/ovis_j23.stl" scale="1 1 1"/>
       </geometry>
     </visual>
   </link>
+  
+  <!-- Link 3 -->
   <link name="ovis2_link_3">
     <collision name="ovis2_j34_col">
-      <origin rpy="0.00000 -0.00000 0.00000" xyz="-0.00000 -0.00000 0.00000"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="../meshes/stl/Low res ovis.029.stl" scale="1.00000 1.00000 1.00000"/>
+        <mesh filename="package://ovis_description/urdf/ovis2/meshes/collision/ovis_j34.stl" scale="1 1 1"/>
       </geometry>
     </collision>
     <inertial>
-      <inertia ixx="0.00001" ixy="0.00000" ixz="0.00000" iyy="0.00001" iyz="0.00000" izz="0.00001"/>
-      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+      <inertia ixx="0.00001" ixy="0" ixz="0" iyy="0.00001" iyz="0" izz="0.00001"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <mass value="0.00001"/>
     </inertial>
     <visual name="ovis2_j34_vis">
-      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00000 0.00000 -0.00000"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <material name="Opaque(128,128,128)"/>
       <geometry>
-        <mesh filename="../meshes/stl/Low res ovis.021.stl" scale="1.00000 1.00000 1.00000"/>
+        <mesh filename="package://ovis_description/urdf/ovis2/meshes/collision/ovis_j34.stl" scale="1 1 1"/>
       </geometry>
     </visual>
   </link>
+  
+  <!-- Link 4 -->
   <link name="ovis2_link_4">
     <collision name="ovis2_j45_col">
-      <origin rpy="0.00000 -0.00000 0.00000" xyz="-0.00000 0.00000 0.00000"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="../meshes/stl/Low res ovis.030.stl" scale="1.00000 1.00000 1.00000"/>
+        <mesh filename="package://ovis_description/urdf/ovis2/meshes/collision/ovis_j45.stl" scale="1 1 1"/>
       </geometry>
     </collision>
     <inertial>
-      <inertia ixx="0.00001" ixy="0.00000" ixz="0.00000" iyy="0.00001" iyz="0.00000" izz="0.00001"/>
-      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+      <inertia ixx="0.00001" ixy="0" ixz="0" iyy="0.00001" iyz="0" izz="0.00001"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <mass value="0.00001"/>
     </inertial>
     <visual name="ovis2_j45_vis">
-      <origin rpy="0.00000 0.00000 0.00000" xyz="-0.00000 0.00000 -0.00000"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <material name="Opaque(128,128,128)"/>
       <geometry>
-        <mesh filename="../meshes/stl/Low res ovis.022.stl" scale="1.00000 1.00000 1.00000"/>
+        <mesh filename="package://ovis_description/urdf/ovis2/meshes/collision/ovis_j45.stl" scale="1 1 1"/>
       </geometry>
     </visual>
   </link>
+  
+  <!-- Link 5 -->
   <link name="ovis2_link_5">
-    <collision name="ovis2_j56_COL">
-      <origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 -0.00000 0.00000"/>
+    <collision name="ovis2_j56_col">
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="../meshes/stl/Low res ovis.031.stl" scale="1.00000 1.00000 1.00000"/>
+        <mesh filename="package://ovis_description/urdf/ovis2/meshes/collision/ovis_j56.stl" scale="1 1 1"/>
       </geometry>
     </collision>
     <inertial>
-      <inertia ixx="0.00001" ixy="0.00000" ixz="0.00000" iyy="0.00001" iyz="0.00000" izz="0.00001"/>
-      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+      <inertia ixx="0.00001" ixy="0" ixz="0" iyy="0.00001" iyz="0" izz="0.00001"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <mass value="0.00001"/>
     </inertial>
     <visual name="ovis2_j56_vis">
-      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00000 -0.00000 0.00000"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <material name="Opaque(128,128,128)"/>
       <geometry>
-        <mesh filename="../meshes/stl/Low res ovis.023.stl" scale="1.00000 1.00000 1.00000"/>
+        <mesh filename="package://ovis_description/urdf/ovis2/meshes/collision/ovis_j56.stl" scale="1 1 1"/>
       </geometry>
     </visual>
   </link>
+  
+  <!-- Link 6 -->
   <link name="ovis2_link_6">
     <collision name="ovis2_end_effector_col">
-      <origin rpy="0.00000 -0.00000 0.00000" xyz="0.00000 -0.00000 0.00000"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="../meshes/stl/Low res ovis.033.stl" scale="1.00000 1.00000 1.00000"/>
+        <mesh filename="package://ovis_description/urdf/ovis2/meshes/collision/ovis_end_effector.stl" scale="1 1 1"/>
       </geometry>
     </collision>
     <inertial>
-      <inertia ixx="0.00001" ixy="0.00000" ixz="0.00000" iyy="0.00001" iyz="0.00000" izz="0.00001"/>
-      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+      <inertia ixx="0.00001" ixy="0" ixz="0" iyy="0.00001" iyz="0" izz="0.00001"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <mass value="0.00001"/>
     </inertial>
     <visual name="ovis2_end_effector_vis">
-      <origin rpy="0.00000 0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
       <material name="Opaque(128,128,128)"/>
       <geometry>
-        <mesh filename="../meshes/stl/Low res ovis.024.stl" scale="1.00000 1.00000 1.00000"/>
+        <mesh filename="package://ovis_description/urdf/ovis2/meshes/collision/ovis_end_effector.stl" scale="1 1 1"/>
       </geometry>
     </visual>
   </link>
+  
   <material name="Aluminum_-_Satin">
-    <color rgba="0.80000 0.80000 0.80000 1.00000"/>
+    <color rgba="0.8 0.8 0.8 1.0"/>
   </material>
   <material name="Opaque(128,128,128)">
-    <color rgba="0.80000 0.80000 0.80000 1.00000"/>
+    <color rgba="0.8 0.8 0.8 1.0"/>
   </material>
 </robot>

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
-project(moveit_servo)
+project(ovis_moveit_servo)
 
 # C++ Libraries #################################################
 
