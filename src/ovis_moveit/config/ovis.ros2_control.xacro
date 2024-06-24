@@ -7,9 +7,10 @@
             <hardware>
                 <!-- By default, set up controllers for simulation. This won't work on real hardware -->
                 <plugin>mock_components/GenericSystem</plugin>
-                <!-- <plugin>ovis_control/OvisHWInterface</plugin>
-                <param name="api_type">ETHERNET</param> 
+                <!-- <plugin>ovis_control/OvisHWInterface</plugin> -->
+
                 <!-- USB or ETHERNET -->
+                <!-- <param name="api_type">ETHERNET</param> 
                 <param name="local_machine_IP">192.168.84.15</param>
                 <param name="subnet_mask">255.255.255.0</param>
                 <param name="local_cmd_port">25015</param>
