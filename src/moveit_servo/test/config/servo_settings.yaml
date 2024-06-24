@@ -31,11 +31,11 @@ smoothing_filter_plugin_name: "online_signal_smoothing::ButterworthFilterPlugin"
 
 ## MoveIt properties
 move_group_name:  panda_arm  # Often 'manipulator' or 'arm'
-planning_frame: panda_link0  # The MoveIt planning frame. Often 'panda_link0' or 'world'
+planning_frame: ovis_link_base  # The MoveIt planning frame. Often 'ovis_link_base' or 'world'
 
 ## Other frames
-ee_frame_name: panda_link7  # The name of the end effector link, used to return the EE pose
-robot_link_command_frame:  panda_link0  # commands must be given in the frame of a robot link. Usually either the base or end effector
+ee_frame_name: ovis_link_6  # The name of the end effector link, used to return the EE pose
+robot_link_command_frame:  ovis_link_base  # commands must be given in the frame of a robot link. Usually either the base or end effector
 
 ## Stopping behaviour
 incoming_command_timeout:  1.0  # Stop servoing if X seconds elapse without a new command

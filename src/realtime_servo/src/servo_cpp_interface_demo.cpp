@@ -72,7 +72,7 @@ void publishCommands()
   {
     auto msg = std::make_unique<control_msgs::msg::JointJog>();
     msg->header.stamp = node_->now();
-    msg->joint_names.push_back("panda_joint1");
+    msg->joint_names.push_back("ovis_joint_1");
     msg->velocities.push_back(0.3);
     joint_cmd_pub_->publish(std::move(msg));
     ++count_;
@@ -84,7 +84,7 @@ void publishCommands()
   {
     auto msg = std::make_unique<geometry_msgs::msg::TwistStamped>();
     msg->header.stamp = node_->now();
-    msg->header.frame_id = "panda_link0";
+    msg->header.frame_id = "ovis_link_base";
     msg->twist.linear.x = 0.3;
     msg->twist.angular.z = 0.5;
     twist_cmd_pub_->publish(std::move(msg));
@@ -136,7 +136,7 @@ int main(int argc, char** argv)
   // Next we will create a collision object in the way of the arm. As the arm is servoed towards it, it will slow down
   // and stop before colliding
   moveit_msgs::msg::CollisionObject collision_object;
-  collision_object.header.frame_id = "panda_link0";
+  collision_object.header.frame_id = "ovis_link_base";
   collision_object.id = "box";
 
   // Make a box and put it in the way

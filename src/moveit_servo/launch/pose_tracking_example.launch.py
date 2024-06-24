@@ -45,13 +45,13 @@ def generate_launch_description():
         parameters=[moveit_config.robot_description],
     )
 
-    # A node to publish world -> panda_link0 transform
+    # A node to publish world -> ovis_link_base transform
     static_tf = Node(
         package="tf2_ros",
         executable="static_transform_publisher",
         name="static_transform_publisher",
         output="log",
-        arguments=["0.0", "0.0", "0.0", "0.0", "0.0", "0.0", "world", "panda_link0"],
+        arguments=["0.0", "0.0", "0.0", "0.0", "0.0", "0.0", "world", "ovis_link_base"],
     )
 
     pose_tracking_node = Node(

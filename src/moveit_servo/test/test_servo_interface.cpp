@@ -106,8 +106,8 @@ TEST_F(ServoFixture, SendJointServoTest)
   {
     auto msg = std::make_unique<control_msgs::msg::JointJog>();
     msg->header.stamp = node_->now();
-    msg->header.frame_id = "panda_link3";
-    msg->joint_names.push_back("panda_joint1");
+    msg->header.frame_id = "ovis_link_3";
+    msg->joint_names.push_back("ovis_joint_1");
     msg->velocities.push_back(0.1);
     pub_joint_cmd_->publish(std::move(msg));
     publish_loop_rate.sleep();
@@ -170,7 +170,7 @@ TEST_F(ServoFixture, DynamicParameterTest)
 
   // This is a dynamic parameter
   request->parameters.push_back(
-      rclcpp::Parameter("moveit_servo.robot_link_command_frame", "panda_link4").to_parameter_msg());
+      rclcpp::Parameter("moveit_servo.robot_link_command_frame", "ovis_link_4").to_parameter_msg());
 
   // This is not even a parameter that is declared (it should fail)
   request->parameters.push_back(rclcpp::Parameter("moveit_servo.not_set_parameter", 1.0).to_parameter_msg());

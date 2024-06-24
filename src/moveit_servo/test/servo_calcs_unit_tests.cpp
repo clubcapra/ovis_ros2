@@ -138,13 +138,13 @@ TEST_F(ServoCalcsUnitTests, SingularityScaling)
   // Start near a singularity
   std::shared_ptr<moveit::core::RobotState> robot_state = std::make_shared<moveit::core::RobotState>(robot_model_);
   robot_state->setToDefaultValues();
-  robot_state->setVariablePosition("panda_joint1", 0.221);
-  robot_state->setVariablePosition("panda_joint2", 0.530);
-  robot_state->setVariablePosition("panda_joint3", -0.231);
-  robot_state->setVariablePosition("panda_joint4", -0.920);
-  robot_state->setVariablePosition("panda_joint5", 0.117);
-  robot_state->setVariablePosition("panda_joint6", 1.439);
-  robot_state->setVariablePosition("panda_joint7", -1.286);
+  robot_state->setVariablePosition("ovis_joint_1", 0.221);
+  robot_state->setVariablePosition("ovis_joint_2", 0.530);
+  robot_state->setVariablePosition("ovis_joint_3", -0.231);
+  robot_state->setVariablePosition("ovis_joint_4", -0.920);
+  robot_state->setVariablePosition("ovis_joint_5", 0.117);
+  robot_state->setVariablePosition("ovis_joint_6", 1.439);
+  robot_state->setVariablePosition("ovis_joint_end_effector", -1.286);
 
   Eigen::MatrixXd jacobian = robot_state->getJacobian(joint_model_group_);
 

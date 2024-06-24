@@ -91,7 +91,7 @@ def generate_servo_test_description(
                 package="tf2_ros",
                 plugin="tf2_ros::StaticTransformBroadcasterNode",
                 name="static_tf2_broadcaster",
-                parameters=[{"/child_frame_id": "panda_link0", "/frame_id": "world"}],
+                parameters=[{"/child_frame_id": "ovis_link_base", "/frame_id": "world"}],
             ),
         ],
         output="screen",

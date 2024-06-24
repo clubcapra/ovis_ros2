@@ -63,61 +63,61 @@ Visualization Manager:
           Expand Link Details: false
           Expand Tree: false
           Link Tree Style: Links in Alphabetic Order
-          panda_hand:
+          ovis_end_effector:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          panda_leftfinger:
+          ovis_end_effector:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          panda_link0:
+          ovis_link_base:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          panda_link1:
+          ovis_link_1:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          panda_link2:
+          ovis_link_2:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          panda_link3:
+          ovis_link_3:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          panda_link4:
+          ovis_link_4:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          panda_link5:
+          ovis_link_5:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          panda_link6:
+          ovis_link_6:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          panda_link7:
+          ovis_link_6:
             Alpha: 1
             Show Axes: false
             Show Trail: false
             Value: true
-          panda_link8:
+          ovis_link_6:
             Alpha: 1
             Show Axes: false
             Show Trail: false
-          panda_rightfinger:
+          ovis_end_effector:
             Alpha: 1
             Show Axes: false
             Show Trail: false
@@ -131,29 +131,29 @@ Visualization Manager:
       Frame Timeout: 15
       Frames:
         All Enabled: false
-        panda_hand:
+        ovis_end_effector:
           Value: true
-        panda_leftfinger:
+        ovis_end_effector:
           Value: false
-        panda_link0:
+        ovis_link_base:
           Value: false
-        panda_link1:
+        ovis_link_1:
           Value: false
-        panda_link2:
+        ovis_link_2:
           Value: false
-        panda_link3:
+        ovis_link_3:
           Value: false
-        panda_link4:
+        ovis_link_4:
           Value: false
-        panda_link5:
+        ovis_link_5:
           Value: false
-        panda_link6:
+        ovis_link_6:
           Value: false
-        panda_link7:
+        ovis_link_6:
           Value: false
-        panda_link8:
+        ovis_link_6:
           Value: false
-        panda_rightfinger:
+        ovis_end_effector:
           Value: false
         world:
           Value: true
@@ -164,19 +164,19 @@ Visualization Manager:
       Show Names: false
       Tree:
         world:
-          panda_link0:
-            panda_link1:
-              panda_link2:
-                panda_link3:
-                  panda_link4:
-                    panda_link5:
-                      panda_link6:
-                        panda_link7:
-                          panda_link8:
-                            panda_hand:
-                              panda_leftfinger:
+          ovis_link_base:
+            ovis_link_1:
+              ovis_link_2:
+                ovis_link_3:
+                  ovis_link_4:
+                    ovis_link_5:
+                      ovis_link_6:
+                        ovis_link_6:
+                          ovis_link_6:
+                            ovis_end_effector:
+                              ovis_end_effector:
                                 {}
-                              panda_rightfinger:
+                              ovis_end_effector:
                                 {}
       Update Interval: 0
       Value: true

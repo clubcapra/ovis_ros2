@@ -65,8 +65,8 @@ TEST_F(ServoFixture, SelfCollision)
   {
     auto msg = std::make_unique<control_msgs::msg::JointJog>();
     msg->header.stamp = node_->now();
-    msg->header.frame_id = "panda_link3";
-    msg->joint_names.push_back("panda_joint4");
+    msg->header.frame_id = "ovis_link_3";
+    msg->joint_names.push_back("ovis_joint_4");
     msg->velocities.push_back(-1.0);
     pub_joint_cmd_->publish(std::move(msg));
     publish_loop_rate.sleep();
@@ -92,7 +92,7 @@ TEST_F(ServoFixture, ExternalCollision)
 
   // Create collision object, in the way of servoing
   moveit_msgs::msg::CollisionObject collision_object;
-  collision_object.header.frame_id = "panda_link0";
+  collision_object.header.frame_id = "ovis_link_base";
   collision_object.id = "box";
 
   shape_msgs::msg::SolidPrimitive box;

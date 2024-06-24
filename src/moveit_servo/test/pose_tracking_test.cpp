@@ -160,7 +160,7 @@ TEST_F(PoseTrackingFixture, OutgoingMsgTest)
   trajectory_msgs::msg::JointTrajectory last_received_msg;
   std::function<void(const trajectory_msgs::msg::JointTrajectory::ConstSharedPtr)> traj_callback =
       [&/* this */](const trajectory_msgs::msg::JointTrajectory::ConstSharedPtr& msg) {
-        EXPECT_EQ(msg->header.frame_id, "panda_link0");
+        EXPECT_EQ(msg->header.frame_id, "ovis_link_base");
 
         // Exact joint positions may vary based on IK solver
         // so check that the EE transform is as expected
@@ -169,12 +169,12 @@ TEST_F(PoseTrackingFixture, OutgoingMsgTest)
         // copyJointGroupPositions can't take a const vector, make a copy
         std::vector<double> positions(msg->points[0].positions);
         temp_state->copyJointGroupPositions(group_name, positions);
-        Eigen::Isometry3d hand_tf = temp_state->getFrameTransform("panda_hand");
+        Eigen::Isometry3d hand_tf = temp_state->getFrameTransform("ovis_end_effector");
 
         moveit::core::RobotStatePtr test_state(planning_scene_monitor_->getStateMonitor()->getCurrentState());
         std::vector<double> test_positions = { 0, -0.785, 0, -2.360, 0, 1.571, 0.758 };
         test_state->copyJointGroupPositions(group_name, test_positions);
-        Eigen::Isometry3d test_hand_tf = test_state->getFrameTransform("panda_hand");
+        Eigen::Isometry3d test_hand_tf = test_state->getFrameTransform("ovis_end_effector");
 
         double precision = 0.02;  // Hilbert-Schmidt norm
         EXPECT_TRUE(test_hand_tf.isApprox(hand_tf, precision));
@@ -186,7 +186,7 @@ TEST_F(PoseTrackingFixture, OutgoingMsgTest)
       "/panda_arm_controller/joint_trajectory", rclcpp::SystemDefaultsQoS(), traj_callback);
 
   geometry_msgs::msg::PoseStamped target_pose;
-  target_pose.header.frame_id = "panda_link4";
+  target_pose.header.frame_id = "ovis_link_4";
   target_pose.header.stamp = node_->now();
   target_pose.pose.position.x = 0.2;
   target_pose.pose.position.y = 0.2;

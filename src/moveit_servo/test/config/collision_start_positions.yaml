@@ -1,16 +1,16 @@
 initial_positions:
-  panda_joint1: 0.0
-  panda_joint2: -0.785
-  panda_joint3: 0.0
-  panda_joint4: -2.9
-  panda_joint5: 0.0
-  panda_joint6: 1.1
-  panda_joint7: 0.785
+  ovis_joint_1: 0.0
+  ovis_joint_2: -0.785
+  ovis_joint_3: 0.0
+  ovis_joint_4: -2.9
+  ovis_joint_5: 0.0
+  ovis_joint_6: 1.1
+  ovis_joint_end_effector: 0.785
 initial_velocities:
-  panda_joint1: 0.0
-  panda_joint2: 0.0
-  panda_joint3: 0.0
-  panda_joint4: 0.0
-  panda_joint5: 0.0
-  panda_joint6: 0.0
-  panda_joint7: 0.0
+  ovis_joint_1: 0.0
+  ovis_joint_2: 0.0
+  ovis_joint_3: 0.0
+  ovis_joint_4: 0.0
+  ovis_joint_5: 0.0
+  ovis_joint_6: 0.0
+  ovis_joint_end_effector: 0.0
