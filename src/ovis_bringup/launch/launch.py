@@ -17,6 +17,7 @@ def generate_launch_description():
     bringup_pkg_path = get_package_share_directory('ovis_bringup')
     moveit_pkg_path = get_package_share_directory('ovis_moveit')
     pkg_ros_gz_sim = get_package_share_directory('ros_gz_sim')
+    pkg_ovis_servo = get_package_share_directory('ovis_servo')
 
     # Get the URDF file (robot)
     urdf_path = os.path.join(moveit_pkg_path, 'config', 'ovis.urdf.xacro')
@@ -115,6 +116,12 @@ def generate_launch_description():
         output='screen'
     )
 
+    servo =  IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(pkg_ovis_servo, 'launch', 'servo.launch.py')
+        )
+    )
+
     return LaunchDescription([
             virtual_joints_launch,
             robot_state_publisher,
@@ -122,6 +129,7 @@ def generate_launch_description():
             rviz_launch,
             fake_joint_driver,
             spawn_controllers_launch,
+            servo,
             #gz_sim,
             #bridge,
             #create,
