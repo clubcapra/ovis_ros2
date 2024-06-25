@@ -19,8 +19,7 @@
  *     from this software without specific prior written permission.
  *
  *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- *  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ *  "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
  *  FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
  *  COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
  *  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
@@ -33,7 +32,7 @@
  *********************************************************************/
 
 /*      Title     : joystick_servo_example.cpp
- *      Project   : moveit_servo
+ *      Project   : ovis_servo
  *      Created   : 08/07/2020
  *      Author    : Adam Pettinger
  */
@@ -58,7 +57,7 @@
 const std::string JOY_TOPIC = "/joy";
 const std::string TWIST_TOPIC = "/servo_node/delta_twist_cmds";
 const std::string JOINT_TOPIC = "/servo_node/delta_joint_cmds";
-const std::string EEF_FRAME_ID = "ovis_link_6";
+const std::string EEF_FRAME_ID = "ovis_end_effector";
 const std::string BASE_FRAME_ID = "ovis_link_base";
 
 // Enums for button names -> axis/button array index
@@ -67,10 +66,10 @@ enum Axis
 {
   LEFT_STICK_X = 0,
   LEFT_STICK_Y = 1,
-  RIGHT_STICK_X = 2,
-  RIGHT_STICK_Y = 3,
-  RIGHT_TRIGGER = 4,
-  LEFT_TRIGGER = 5,
+  LEFT_TRIGGER = 2,
+  RIGHT_STICK_X = 3,
+  RIGHT_STICK_Y = 4,
+  RIGHT_TRIGGER = 5,
   D_PAD_X = 6,
   D_PAD_Y = 7
 };
@@ -78,16 +77,15 @@ enum Button
 {
   A = 0,
   B = 1,
-  UNDER_RIGHT = 2,
-  X = 3,
-  Y = 4,
-  UNDER_LEFT = 5,
-  LEFT_BUMPER = 6,
-  RIGHT_BUMPER = 7,
-  SELECT = 10,
-  START = 11,
-  LEFT_STICK_CLICK = 13,
-  RIGHT_STICK_CLICK = 14
+  X = 2,
+  Y = 3,
+  LEFT_BUMPER = 4,
+  RIGHT_BUMPER = 5,
+  CHANGE_VIEW = 6,
+  MENU = 7,
+  HOME = 8,
+  LEFT_STICK_CLICK = 9,
+  RIGHT_STICK_CLICK = 10
 };
 
 // Some axes have offsets (e.g. the default trigger position is 1.0 not 0)
@@ -112,17 +110,18 @@ bool convertJoyToCmd(const std::vector<float>& axes, const std::vector<int>& but
   // If any joint jog command is requested, we are only publishing joint commands
   if (buttons[A] || buttons[B] || buttons[X] || buttons[Y] || axes[D_PAD_X] || axes[D_PAD_Y])
   {
+
     // Map the D_PAD to the proximal joints
-    joint->joint_names.push_back("arm_joint_1");
+    joint->joint_names.push_back("ovis_joint_1");
     joint->velocities.push_back(axes[D_PAD_X]);
-    joint->joint_names.push_back("arm_joint_2");
-    joint->velocities.push_back(axes[D_PAD_Y]);
+    joint->joint_names.push_back("ovis_joint_2");
+    joint->velocities.push_back(-axes[D_PAD_Y]);
 
     // Map the diamond to the distal joints
-    joint->joint_names.push_back("arm_joint_5");
+    joint->joint_names.push_back("ovis_joint_5");
     joint->velocities.push_back(buttons[B] - buttons[X]);
-    joint->joint_names.push_back("arm_joint_6");
-    joint->velocities.push_back(buttons[Y] - buttons[A]);
+    joint->joint_names.push_back("ovis_joint_3");
+    joint->velocities.push_back(buttons[A]- buttons[Y]);
     return false;
   }
 
@@ -150,9 +149,9 @@ bool convertJoyToCmd(const std::vector<float>& axes, const std::vector<int>& but
  */
 void updateCmdFrame(std::string& frame_name, const std::vector<int>& buttons)
 {
-  if (buttons[SELECT] && frame_name == EEF_FRAME_ID)
+  if (buttons[CHANGE_VIEW] && frame_name == EEF_FRAME_ID)
     frame_name = BASE_FRAME_ID;
-  else if (buttons[START] && frame_name == BASE_FRAME_ID)
+  else if (buttons[MENU] && frame_name == BASE_FRAME_ID)
     frame_name = EEF_FRAME_ID;
 }
 
@@ -162,7 +161,7 @@ class JoyToServoPub : public rclcpp::Node
 {
 public:
   JoyToServoPub(const rclcpp::NodeOptions& options)
-    : Node("joy_to_servo_publisher", options), frame_to_publish_(BASE_FRAME_ID)
+    : Node("joy_to_twist_publisher", options), frame_to_publish_(BASE_FRAME_ID)
   {
     // Setup pub/sub
     joy_sub_ = this->create_subscription<sensor_msgs::msg::Joy>(
@@ -248,7 +247,7 @@ public:
     {
       // publish the JointJog
       joint_msg->header.stamp = this->now();
-      joint_msg->header.frame_id = "arm_joint_6";
+      joint_msg->header.frame_id = "ovis_link_base";
       joint_pub_->publish(std::move(joint_msg));
     }
   }
