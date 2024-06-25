@@ -18,6 +18,7 @@ set(THIS_PACKAGE_INCLUDE_DEPENDS
   control_msgs
   control_toolbox
   geometry_msgs
+  moveit_servo
   moveit_core
   moveit_msgs
   moveit_ros_planning
@@ -44,6 +45,11 @@ add_library(${SERVO_CONTROLLER_INPUT} SHARED src/joystick_servo.cpp)
 ament_target_dependencies(${SERVO_CONTROLLER_INPUT} ${THIS_PACKAGE_INCLUDE_DEPENDS})
 rclcpp_components_register_nodes(${SERVO_CONTROLLER_INPUT} "ovis_servo::JoyToServoPub")
 
+add_executable(servo_keyboard_input src/servo_keyboard_input.cpp)
+target_include_directories(servo_keyboard_input PUBLIC include)
+ament_target_dependencies(servo_keyboard_input  ${THIS_PACKAGE_INCLUDE_DEPENDS})
+
+
 
 # Install Libraries
 install(
@@ -53,11 +59,17 @@ install(
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib
   RUNTIME DESTINATION bin
-  INCLUDES DESTINATION include
 )
 
+install(
+  TARGETS
+    servo_keyboard_input
+  DESTINATION
+    lib/${PROJECT_NAME}
+)
+
+
 # Install include, launch, config directories
-install(DIRECTORY include/ DESTINATION include)
 install(DIRECTORY launch DESTINATION share/${PROJECT_NAME})
 install(DIRECTORY config DESTINATION share/${PROJECT_NAME})
 
