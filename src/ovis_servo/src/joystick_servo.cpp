@@ -40,10 +40,12 @@
 #include <sensor_msgs/msg/joy.hpp>
 #include <geometry_msgs/msg/twist_stamped.hpp>
 #include <control_msgs/msg/joint_jog.hpp>
+#include <control_msgs/action/gripper_command.hpp>
 #include <std_srvs/srv/trigger.hpp>
 #include <moveit_msgs/msg/planning_scene.hpp>
 #include <rclcpp/client.hpp>
 #include <rclcpp/experimental/buffers/intra_process_buffer.hpp>
+#include <rclcpp_action/rclcpp_action.hpp>
 #include <rclcpp/node.hpp>
 #include <rclcpp/publisher.hpp>
 #include <rclcpp/qos.hpp>
@@ -178,6 +180,12 @@ public:
     servo_start_client_->wait_for_service(std::chrono::seconds(1));
     servo_start_client_->async_send_request(std::make_shared<std_srvs::srv::Trigger::Request>());
 
+    // Initialize gripper action client
+    gripper_action_client_ = rclcpp_action::create_client<control_msgs::action::GripperCommand>(
+        this, "/robotiq_gripper_controller/gripper_cmd");
+
+    gripper_action_client_->wait_for_action_server(std::chrono::seconds(1));
+
     // Load the collision scene asynchronously
     collision_pub_thread_ = std::thread([this]() {
       rclcpp::sleep_for(std::chrono::seconds(3));
@@ -235,6 +243,16 @@ public:
     // This call updates the frame for twist commands
     updateCmdFrame(frame_to_publish_, msg->buttons);
 
+    // Check for gripper commands
+    if (msg->buttons[LEFT_STICK_CLICK])
+    {
+      sendGripperCommand(1.0, 1.0); // Open gripper
+    }
+    else if (msg->buttons[RIGHT_STICK_CLICK])
+    {
+      sendGripperCommand(0.0, 1.0); // Close gripper
+    }
+
     // Convert the joystick message to Twist or JointJog and publish
     if (convertJoyToCmd(msg->axes, msg->buttons, twist_msg, joint_msg))
     {
@@ -252,12 +270,27 @@ public:
     }
   }
 
+  void sendGripperCommand(double position, double max_effort)
+  {
+    auto goal_msg = control_msgs::action::GripperCommand::Goal();
+    goal_msg.command.position = position;
+    goal_msg.command.max_effort = max_effort;
+
+    auto send_goal_options = rclcpp_action::Client<control_msgs::action::GripperCommand>::SendGoalOptions();
+    send_goal_options.result_callback = [](const rclcpp_action::ClientGoalHandle<control_msgs::action::GripperCommand>::WrappedResult & result) {
+      // Handle result here
+    };
+
+    gripper_action_client_->async_send_goal(goal_msg, send_goal_options);
+  }
+
 private:
   rclcpp::Subscription<sensor_msgs::msg::Joy>::SharedPtr joy_sub_;
   rclcpp::Publisher<geometry_msgs::msg::TwistStamped>::SharedPtr twist_pub_;
   rclcpp::Publisher<control_msgs::msg::JointJog>::SharedPtr joint_pub_;
   rclcpp::Publisher<moveit_msgs::msg::PlanningScene>::SharedPtr collision_pub_;
   rclcpp::Client<std_srvs::srv::Trigger>::SharedPtr servo_start_client_;
+  rclcpp_action::Client<control_msgs::action::GripperCommand>::SharedPtr gripper_action_client_;
 
   std::string frame_to_publish_;
 
