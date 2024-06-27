@@ -4,6 +4,7 @@
 
     <!-- Import ovis urdf file -->
     <xacro:include filename="$(find ovis_description)/urdf/ovis_standalone.urdf.xacro" />
+    <!-- <xacro:include filename="$(find ovis_description)/urdf/ovis2/urdf/ovis.urdf.xacro" /> -->
 
     <!-- Import control_xacro -->
     <xacro:include filename="ovis.ros2_control.xacro" />

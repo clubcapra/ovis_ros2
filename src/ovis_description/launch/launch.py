@@ -19,18 +19,18 @@ def generate_launch_description():
     urdf_path = os.path.join(pkg_ovis_description, 'urdf', 'ovis_standalone.urdf.xacro')
     robot_desc = ParameterValue(Command(['xacro ', urdf_path]), value_type=str)
 
-    # Spawn robot
-    create = Node(
-        package='ros_gz_sim',
-        executable='create',
-        arguments=['-name', 'ovis',
-                   '-topic', 'robot_description',
-                   '-x', '0',
-                   '-y', '0',
-                   '-z', '0.1',
-                   ],
-        output='screen',
-    )
+    # # Spawn robot
+    # create = Node(
+    #     package='ros_gz_sim',
+    #     executable='create',
+    #     arguments=['-name', 'ovis',
+    #                '-topic', 'robot_description',
+    #                '-x', '0',
+    #                '-y', '0',
+    #                '-z', '0.1',
+    #                ],
+    #     output='screen',
+    # )
 
     # Takes the description and joint angles as inputs and publishes
     # the 3D poses of the robot links
@@ -63,5 +63,5 @@ def generate_launch_description():
             joint_state_gui,
             robot_state_publisher,
             rviz,
-            create,
+            # create,
             ])

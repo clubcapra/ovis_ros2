@@ -16,7 +16,7 @@ def generate_launch_description():
     pkg_ovis_description = get_package_share_directory('ovis_description')
     bringup_pkg_path = get_package_share_directory('ovis_bringup')
     moveit_pkg_path = get_package_share_directory('ovis_moveit')
-    pkg_ros_gz_sim = get_package_share_directory('ros_gz_sim')
+    # pkg_ros_gz_sim = get_package_share_directory('ros_gz_sim')
     pkg_ovis_servo = get_package_share_directory('ovis_servo')
 
     # Get the URDF file (robot)
@@ -84,37 +84,37 @@ def generate_launch_description():
     )
 
     # Setup to launch the simulator and Gazebo world
-    gz_sim = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(pkg_ros_gz_sim, 'launch', 'gz_sim.launch.py')),
-        launch_arguments={'gz_args': "-v 4 -r " + world}.items(),
-    )
+    # gz_sim = IncludeLaunchDescription(
+    #     PythonLaunchDescriptionSource(
+    #         os.path.join(pkg_ros_gz_sim, 'launch', 'gz_sim.launch.py')),
+    #     launch_arguments={'gz_args': "-v 4 -r " + world}.items(),
+    # )
 
     # Spawn robot
-    create = Node(
-        package='ros_gz_sim',
-        executable='create',
-        arguments=['-name', 'ovis',
-                   '-topic', 'robot_description',
-                   '-x', '0',
-                   '-y', '0',
-                   '-z', '0.1',
-                   ],
-        output='screen',
-    )
+    # create = Node(
+    #     package='ros_gz_sim',
+    #     executable='create',
+    #     arguments=['-name', 'ovis',
+    #                '-topic', 'robot_description',
+    #                '-x', '0',
+    #                '-y', '0',
+    #                '-z', '0.1',
+    #                ],
+    #     output='screen',
+    # )
 
     # Bridge ROS topics and Gazebo messages for establishing communication
-    bridge = Node(
-        package='ros_gz_bridge',
-        executable='parameter_bridge',
-        parameters=[{
-            'config_file': os.path.join(pkg_ovis_description, 'config',
-                                        'default_bridge.yaml'),
-            'qos_overrides./tf_static.publisher.durability': 'transient_local',
-            "use_sim_time": True,
-        }],
-        output='screen'
-    )
+    # bridge = Node(
+    #     package='ros_gz_bridge',
+    #     executable='parameter_bridge',
+    #     parameters=[{
+    #         'config_file': os.path.join(pkg_ovis_description, 'config',
+    #                                     'default_bridge.yaml'),
+    #         'qos_overrides./tf_static.publisher.durability': 'transient_local',
+    #         "use_sim_time": True,
+    #     }],
+    #     output='screen'
+    # )
 
     servo =  IncludeLaunchDescription(
         PythonLaunchDescriptionSource(

@@ -66,6 +66,9 @@ def generate_launch_description():
                 package="joy",
                 plugin="joy::Joy",
                 name="joy_node",
+                remappings=[
+                    ('/joy', '/ovis/joy')
+                ]
             ),
         ],
         output="screen",
