@@ -7,7 +7,7 @@ moveit_setup_assistant_config:
   package_settings:
     author_name: capra
     author_email: capra@ens.etsmtl.ca
-    generated_timestamp: 1715834118
+    generated_timestamp: 1719226679
   control_xacro:
     command:
       - position

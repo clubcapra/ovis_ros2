@@ -7,17 +7,9 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(Qt5 COMPONENTS Widgets REQUIRED)
-
-add_executable(ovis_controller_node src/ovis_controller_node.cpp)
-
-# Link dependencies
-ament_target_dependencies(ovis_controller_node rclcpp sensor_msgs)
-
-# Install executable
-install(TARGETS
-  ovis_controller_node
-  DESTINATION lib/${PROJECT_NAME}
-)
+find_package(rclpy REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(trajectory_msgs REQUIRED)
 
 # Install launch files
 install(DIRECTORY
@@ -27,5 +19,10 @@ install(DIRECTORY
 install(DIRECTORY
   config
   DESTINATION share/${PROJECT_NAME}
+)
+# Install Python scripts
+install(PROGRAMS
+  scripts/publish_trajectory.py
+  DESTINATION lib/${PROJECT_NAME}
 )
 ament_package()

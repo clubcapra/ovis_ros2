@@ -95,7 +95,8 @@
     <xacro:property name="joint_end_effector_origin_rpy" value="${J_PI} 0 ${J_PI/2}" />
 
 
-    <xacro:macro name="ovis" params="base_parent prefix:=ovis joint_base_origin_xyz:='0 0 0'">
+    <xacro:macro name="ovis" params="base_parent type:=ovis prefix:=ovis joint_base_origin_xyz:='0 0 0'">
+
 
         <xacro:gazebo_config robot_namespace="${prefix}" />
 

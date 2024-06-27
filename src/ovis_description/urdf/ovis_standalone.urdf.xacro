@@ -5,8 +5,10 @@
 
 
     <xacro:include filename="$(find ovis_description)/urdf/gazebo.urdf.xacro" />
-    <xacro:include filename="$(find ovis_description)/urdf/ovis.urdf.xacro" />
-    <xacro:include filename="$(find ovis_description)/urdf/kinova_common.xacro" />
+    <!-- <xacro:include filename="$(find ovis_description)/urdf/ovis.urdf.xacro" /> -->
+    <xacro:include filename="$(find ovis_description)/urdf/ovis2/urdf/ovis.urdf.xacro" />
+    <!-- <xacro:include filename="$(find ovis_description)/urdf/kinova_common.xacro" /> -->
+    <xacro:include filename="$(find ovis_description)/urdf/ovis2/urdf/ovis_common.xacro" />
 
     
     <link name="base_link" />

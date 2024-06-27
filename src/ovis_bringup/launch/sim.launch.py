@@ -67,5 +67,5 @@ def generate_launch_description():
             gz_sim,
             bridge,
             create,
-            common,
+            #common,
             ])

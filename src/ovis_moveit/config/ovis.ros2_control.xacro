@@ -1,12 +1,21 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
     <xacro:macro name="ovis_ros2_control" params="name initial_positions_file">
-        <xacro:property name="initial_positions" value="${load_yaml(initial_positions_file)['initial_positions']}"/>
+        <xacro:property name="initial_positions" value="${xacro.load_yaml(initial_positions_file)['initial_positions']}"/>
 
         <ros2_control name="${name}" type="system">
             <hardware>
                 <!-- By default, set up controllers for simulation. This won't work on real hardware -->
                 <plugin>mock_components/GenericSystem</plugin>
+                <!-- <plugin>ovis_control/OvisHWInterface</plugin> -->
+
+                <!-- USB or ETHERNET -->
+                <!-- <param name="api_type">ETHERNET</param> 
+                <param name="local_machine_IP">192.168.84.15</param>
+                <param name="subnet_mask">255.255.255.0</param>
+                <param name="local_cmd_port">25015</param>
+                <param name="local_broadcast_port">25025</param>
+                <param name="robot_ip_address">192.168.84.160</param> -->
             </hardware>
             <joint name="ovis_joint_1">
                 <command_interface name="position"/>
