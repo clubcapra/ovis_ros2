@@ -6,7 +6,7 @@ from launch.event_handlers import OnProcessExit
 from launch.substitutions import Command, FindExecutable, PathJoinSubstitution
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 
-from launch_ros.actions import Node
+from launch_ros.actions import Node, SetParameter
 from launch_ros.substitutions import FindPackageShare
 from launch_ros.parameter_descriptions import ParameterValue
 
@@ -53,9 +53,13 @@ def generate_launch_description():
         PythonLaunchDescriptionSource(
             os.path.join(pkg_ovis_moveit, 'launch', 'move_group.launch.py'),
         ),
-        launch_arguments={
-            "use_sim_time": "true",
-        }.items(),
+    )
+
+    # Set the use_sim_time parameter to true for the entire system
+    # Move group doesn't accept use sim time as an argument, we need to manually call it or use SetParameter
+    set_use_sim_time = SetParameter(
+        name='use_sim_time',
+        value='true',
     )
 
     rviz_launch = IncludeLaunchDescription(
@@ -75,7 +79,7 @@ def generate_launch_description():
     )
 
     # Spawn robot
-    create = Node(
+    ovis_spawner = Node(
         package='ros_gz_sim',
         executable='create',
         arguments=['-name', 'ovis',
@@ -122,7 +126,7 @@ def generate_launch_description():
     return LaunchDescription([
             RegisterEventHandler(
                 event_handler=OnProcessExit(
-                    target_action=create,
+                    target_action=ovis_spawner,
                     on_exit=[load_joint_state_broadcaster],
                 )
             ),
@@ -134,9 +138,11 @@ def generate_launch_description():
             ),
             virtual_joints_launch,
             robot_state_publisher,
+            set_use_sim_time,
             move_group_launch,
             rviz_launch,
             gz_sim,
             bridge,
-            create,
+            ovis_spawner,
+            servo,
             ])
