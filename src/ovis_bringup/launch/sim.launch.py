@@ -1,13 +1,12 @@
 import os
 from ament_index_python import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, ExecuteProcess, IncludeLaunchDescription, RegisterEventHandler
+from launch.actions import ExecuteProcess, IncludeLaunchDescription, RegisterEventHandler
 from launch.event_handlers import OnProcessExit
-from launch.substitutions import Command, FindExecutable, PathJoinSubstitution
+from launch.substitutions import Command 
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 
 from launch_ros.actions import Node, SetParameter
-from launch_ros.substitutions import FindPackageShare
 from launch_ros.parameter_descriptions import ParameterValue
 
 def generate_launch_description():
@@ -20,7 +19,7 @@ def generate_launch_description():
 
     # Get the URDF file (robot)
     urdf_path = os.path.join(moveit_pkg_path, 'config', 'ovis.urdf.xacro')
-    robot_desc = ParameterValue(Command(['xacro ', urdf_path]), value_type=str)
+    robot_desc = ParameterValue(Command(['xacro ', urdf_path, ' hardware_type:=', "gazebo"]), value_type=str)
 
     # Get the URDF file (world)
     world_file_name = 'worlds/base_world.world'
@@ -78,7 +77,7 @@ def generate_launch_description():
         launch_arguments={'gz_args': "-v 4 -r " + world}.items(),
     )
 
-    # Spawn robot
+    # Spawn ovis (robot arm)
     ovis_spawner = Node(
         package='ros_gz_sim',
         executable='create',
