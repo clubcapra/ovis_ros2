@@ -1,19 +1,17 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-    <xacro:macro name="gazebo_config" params="robot_namespace">
-        <!-- ros_control plugin -->
-        <gazebo>
-            <plugin filename="gz_ros2_control-system"
-                name="gz_ros2_control::GazeboSimROS2ControlPlugin">
-                <robot_param>robot_description</robot_param>
-                <robot_param_node>robot_state_publisher</robot_param_node>
-                <parameters>$(find ovis_moveit)/config/ros2_controllers.yaml</parameters>
-                <controller_manager_prefix_node_name>controller_manager</controller_manager_prefix_node_name>
-            </plugin>
-        </gazebo>
+    <!-- ros_control plugin -->
+    <gazebo>
+        <plugin filename="gz_ros2_control-system"
+            name="gz_ros2_control::GazeboSimROS2ControlPlugin">
+            <robot_param>robot_description</robot_param>
+            <robot_param_node>robot_state_publisher</robot_param_node>
+            <parameters>$(find ovis_moveit)/config/ros2_controllers.yaml</parameters>
+            <controller_manager_prefix_node_name>controller_manager</controller_manager_prefix_node_name>
+        </plugin>
+    </gazebo>
 
-    </xacro:macro>
 
     <gazebo>
         <plugin

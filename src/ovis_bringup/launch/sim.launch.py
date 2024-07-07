@@ -28,14 +28,6 @@ def generate_launch_description():
     # Get the launch directory
     pkg_ovis_moveit = get_package_share_directory('ovis_moveit')
 
-
-    # Include launch files based on the configuration
-    virtual_joints_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(pkg_ovis_moveit, 'launch', 'static_virtual_joint_tfs.launch.py')
-        )
-    )
-
     # Takes the description and joint angles as inputs and publishes
     robot_state_publisher = Node(
         package='robot_state_publisher',
@@ -44,7 +36,7 @@ def generate_launch_description():
         output='both',
         parameters=[
             {'robot_description': robot_desc},
-            {"use_sim_time": True, }
+            {"use_sim_time": True }
         ]
     )
 
@@ -135,7 +127,6 @@ def generate_launch_description():
                     on_exit=[load_arm_controller],
                 )
             ),
-            virtual_joints_launch,
             robot_state_publisher,
             set_use_sim_time,
             move_group_launch,
