@@ -15,7 +15,7 @@ def generate_launch_description():
 
     # Get the URDF file (robot)
     urdf_path = os.path.join(moveit_pkg_path, 'config', 'ovis.urdf.xacro')
-    robot_desc = ParameterValue(Command(['xacro ', urdf_path, ' hardware_type:=', "mock"]), value_type=str)
+    robot_desc = ParameterValue(Command(['xacro ', urdf_path, ' hardware_type:=', "ovis"]), value_type=str)
 
     # Get the launch directory
     pkg_ovis_moveit = get_package_share_directory('ovis_moveit')
@@ -56,8 +56,8 @@ def generate_launch_description():
     )
 
 
-    # Fake joint driver
-    fake_joint_driver = Node(
+    # kinova driver
+    kinova_joint_driver = Node(
         package='controller_manager',
         executable='ros2_control_node',
         parameters=[
@@ -84,7 +84,7 @@ def generate_launch_description():
             robot_state_publisher,
             move_group_launch,
             rviz_launch,
-            fake_joint_driver,
+            kinova_joint_driver,
             spawn_controllers_launch,
             servo,
             ])

@@ -11,7 +11,23 @@
     <xacro:include filename="$(find ovis_description)/urdf/ovis2/urdf/ovis_common.xacro" />
 
     
-    <link name="base_link" />
+    <link name="world" />
+
+    <!-- Define the base link -->
+    <link name="base_link">
+        <inertial>
+            <origin xyz="0 0 0" />
+            <mass value="1.0" />
+            <inertia ixx="1.0" ixy="0.0" ixz="0.0" iyy="1.0" iyz="0.0" izz="1.0" />
+        </inertial>
+    </link>
+
+    <!-- Attach the base_link to the world with a fixed joint -->
+    <joint name="fixed_to_world" type="fixed">
+        <parent link="world" />
+        <child link="base_link" />
+        <origin xyz="0 0 0" rpy="0 0 0" />
+    </joint>
 
     <xacro:property name="robot_root" value="base_link" />
 
