@@ -28,11 +28,14 @@ def generate_launch_description():
     # Get the launch directory
     pkg_ovis_moveit = get_package_share_directory('ovis_moveit')
 
+    namespace = '/ovis'
+
     # Takes the description and joint angles as inputs and publishes
     robot_state_publisher = Node(
         package='robot_state_publisher',
         executable='robot_state_publisher',
         name='robot_state_publisher',
+        namespace=namespace,
         output='both',
         parameters=[
             {'robot_description': robot_desc},
@@ -72,9 +75,10 @@ def generate_launch_description():
     # Spawn ovis (robot arm)
     ovis_spawner = Node(
         package='ros_gz_sim',
+        namespace=namespace,
         executable='create',
         arguments=['-name', 'ovis',
-                   '-topic', 'robot_description',
+                   '-topic', '/ovis/robot_description',
                    '-x', '0',
                    '-y', '0',
                    '-z', '0.1',
@@ -86,6 +90,7 @@ def generate_launch_description():
     bridge = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
+        namespace=namespace,
         parameters=[{
             'config_file': os.path.join(pkg_ovis_description, 'config',
                                         'default_bridge.yaml'),
@@ -103,30 +108,30 @@ def generate_launch_description():
 
     load_joint_state_broadcaster = ExecuteProcess(
         cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
-             'joint_state_broadcaster'],
+             'joint_state_broadcaster', '-c', '/ovis/controller_manager'],
         output='screen'
     )
 
     load_arm_controller = ExecuteProcess(
         cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
-             'arm_controller'],
+             'arm_controller', '-c', '/ovis/controller_manager'],
         output='screen'
     )
 
 
     return LaunchDescription([
-            RegisterEventHandler(
-                event_handler=OnProcessExit(
-                    target_action=ovis_spawner,
-                    on_exit=[load_joint_state_broadcaster],
-                )
-            ),
-            RegisterEventHandler(
-                event_handler=OnProcessExit(
-                    target_action=load_joint_state_broadcaster,
-                    on_exit=[load_arm_controller],
-                )
-            ),
+            # RegisterEventHandler(
+            #     event_handler=OnProcessExit(
+            #         target_action=ovis_spawner,
+            #         on_exit=[load_joint_state_broadcaster],
+            #     )
+            # ),
+            # RegisterEventHandler(
+            #     event_handler=OnProcessExit(
+            #         target_action=load_joint_state_broadcaster,
+            #         on_exit=[load_arm_controller],
+            #     )
+            # ),
             robot_state_publisher,
             set_use_sim_time,
             move_group_launch,

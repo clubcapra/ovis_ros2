@@ -9,6 +9,9 @@
             <robot_param_node>robot_state_publisher</robot_param_node>
             <parameters>$(find ovis_moveit)/config/ros2_controllers.yaml</parameters>
             <controller_manager_prefix_node_name>controller_manager</controller_manager_prefix_node_name>
+            <ros>
+                <namespace>/ovis</namespace>
+            </ros>
         </plugin>
     </gazebo>
 
@@ -18,6 +21,9 @@
             filename="gz-sim-joint-state-publisher-system"
             name="gz::sim::systems::JointStatePublisher">
             <topic>joint_states</topic>
+            <ros>
+                <namespace>/ovis</namespace>
+            </ros>
         </plugin>
         <plugin
             filename="gz-sim-sensors-system"
