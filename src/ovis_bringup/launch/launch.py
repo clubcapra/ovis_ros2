@@ -4,6 +4,8 @@ from launch import LaunchDescription
 from launch.substitutions import Command
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.actions import IncludeLaunchDescription
+from launch.actions import ExecuteProcess, IncludeLaunchDescription, RegisterEventHandler
+from launch.event_handlers import OnProcessExit
 
 from launch_ros.actions import Node
 from launch_ros.parameter_descriptions import ParameterValue
@@ -32,6 +34,7 @@ def generate_launch_description():
     robot_state_publisher = Node(
         package='robot_state_publisher',
         executable='robot_state_publisher',
+        namespace='/ovis',
         name='robot_state_publisher',
         output='both',
         parameters=[
@@ -59,6 +62,7 @@ def generate_launch_description():
     # Fake joint driver
     fake_joint_driver = Node(
         package='controller_manager',
+        namespace='/ovis',
         executable='ros2_control_node',
         parameters=[
             {'robot_description': robot_desc},
@@ -67,10 +71,16 @@ def generate_launch_description():
         ],
     )
 
-    spawn_controllers_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(pkg_ovis_moveit, 'launch', 'spawn_controllers.launch.py')
-        )
+    load_joint_state_broadcaster = ExecuteProcess(
+        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
+             'joint_state_broadcaster', '-c', '/ovis/controller_manager'],
+        output='screen'
+    )
+
+    load_arm_controller = ExecuteProcess(
+        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
+             'arm_controller', '-c', '/ovis/controller_manager'],
+        output='screen'
     )
 
     servo =  IncludeLaunchDescription(
@@ -80,11 +90,22 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
+            RegisterEventHandler(
+                event_handler=OnProcessExit(
+                    target_action=robot_state_publisher,
+                    on_exit=[load_joint_state_broadcaster],
+                )
+            ),
+            RegisterEventHandler(
+                event_handler=OnProcessExit(
+                    target_action=load_joint_state_broadcaster,
+                    on_exit=[load_arm_controller],
+                )
+            ),
             virtual_joints_launch,
             robot_state_publisher,
             move_group_launch,
             rviz_launch,
             fake_joint_driver,
-            spawn_controllers_launch,
             servo,
             ])

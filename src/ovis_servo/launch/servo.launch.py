@@ -53,18 +53,21 @@ def generate_launch_description():
     # Launch as much as possible in components
     container = ComposableNodeContainer(
         name="moveit_servo_demo_container",
-        namespace="ovis",
+        namespace="/ovis",
         package="rclcpp_components",
         executable="component_container_mt",
         composable_node_descriptions=[
             ComposableNode(
                 package="ovis_servo",
+                namespace="/ovis",
                 plugin="ovis_servo::JoyToServoPub",
                 name="controller_to_servo_node",
                 parameters=[{'use_sim_time': True}],
+                remappings=[("/planning_scene", "/ovis/planning_scene")],
             ),
             ComposableNode(
                 package="joy",
+                namespace="/ovis",
                 plugin="joy::Joy",
                 name="joy_node",
                 parameters=[{'use_sim_time': True}],
