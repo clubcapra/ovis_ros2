@@ -18,7 +18,6 @@ def generate_launch_description():
         "publish_geometry_updates": True,
         "publish_state_updates": True,
         "publish_transforms_updates": True,
-        "robot_description_param" : '/ovis/robot_description',
         "monitor_dynamics": False,
     }
 

@@ -59,15 +59,15 @@ def generate_launch_description():
         composable_node_descriptions=[
             ComposableNode(
                 package="ovis_servo",
-                namespace="ovis",
                 plugin="ovis_servo::JoyToServoPub",
                 name="controller_to_servo_node",
+                parameters=[{'use_sim_time': True}],
             ),
             ComposableNode(
                 package="joy",
-                namespace="ovis",
                 plugin="joy::Joy",
                 name="joy_node",
+                parameters=[{'use_sim_time': True}],
             ),
         ],
         output="screen",

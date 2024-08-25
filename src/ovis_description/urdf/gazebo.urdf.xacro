@@ -8,7 +8,7 @@
             <robot_param>robot_description</robot_param>
             <robot_param_node>robot_state_publisher</robot_param_node>
             <parameters>$(find ovis_moveit)/config/ros2_controllers.yaml</parameters>
-            <controller_manager_prefix_node_name>controller_manager</controller_manager_prefix_node_name>
+            <controller_manager_node_name>/ovis/controller_manager</controller_manager_node_name>
             <ros>
                 <namespace>/ovis</namespace>
             </ros>
@@ -25,7 +25,7 @@
                 <namespace>/ovis</namespace>
             </ros>
         </plugin>
-        <plugin
+         <plugin 
             filename="gz-sim-sensors-system"
             name="gz::sim::systems::Sensors">
             <render_engine>ogre2</render_engine>

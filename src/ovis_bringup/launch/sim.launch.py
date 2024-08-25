@@ -90,7 +90,6 @@ def generate_launch_description():
     bridge = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
-        namespace=namespace,
         parameters=[{
             'config_file': os.path.join(pkg_ovis_description, 'config',
                                         'default_bridge.yaml'),
@@ -120,22 +119,22 @@ def generate_launch_description():
 
 
     return LaunchDescription([
-            # RegisterEventHandler(
-            #     event_handler=OnProcessExit(
-            #         target_action=ovis_spawner,
-            #         on_exit=[load_joint_state_broadcaster],
-            #     )
-            # ),
-            # RegisterEventHandler(
-            #     event_handler=OnProcessExit(
-            #         target_action=load_joint_state_broadcaster,
-            #         on_exit=[load_arm_controller],
-            #     )
-            # ),
+            RegisterEventHandler(
+                event_handler=OnProcessExit(
+                    target_action=ovis_spawner,
+                    on_exit=[load_joint_state_broadcaster],
+                )
+            ),
+            RegisterEventHandler(
+                event_handler=OnProcessExit(
+                    target_action=load_joint_state_broadcaster,
+                    on_exit=[load_arm_controller],
+                )
+            ),
             robot_state_publisher,
             set_use_sim_time,
             move_group_launch,
-            rviz_launch,
+            # rviz_launch,
             gz_sim,
             bridge,
             ovis_spawner,
