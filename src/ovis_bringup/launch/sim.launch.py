@@ -75,7 +75,7 @@ def generate_launch_description():
     # Spawn ovis (robot arm)
     ovis_spawner = Node(
         package='ros_gz_sim',
-        namespace=namespace,
+        # namespace=namespace,
         executable='create',
         arguments=['-name', 'ovis',
                    '-topic', '/ovis/robot_description',
@@ -134,9 +134,9 @@ def generate_launch_description():
             robot_state_publisher,
             set_use_sim_time,
             move_group_launch,
-            # rviz_launch,
+            rviz_launch,
             gz_sim,
             bridge,
             ovis_spawner,
-            servo,
+            # servo,
             ])

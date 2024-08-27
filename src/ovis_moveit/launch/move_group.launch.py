@@ -30,9 +30,10 @@ def generate_launch_description():
         package="moveit_ros_move_group",
         executable="move_group",
         output="screen",
-        namespace="ovis",
+        # namespace="ovis",
         parameters=move_group_params,
         # Set the display variable, in case OpenGL code is used internally
         additional_env={"DISPLAY": ":0"},
+        remappings=[('/joint_states', '/ovis/joint_states')],
     )
     return LaunchDescription([move_group])

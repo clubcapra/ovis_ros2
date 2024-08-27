@@ -58,10 +58,10 @@ joint_limit_margin: 0.1 # added as a buffer to joint limits [radians]. If moving
 leaving_singularity_threshold_multiplier: 2.0 # Multiply the hard stop limit by this when leaving singularity (see https://github.com/ros-planning/moveit2/pull/620)
 
 ## Topic names
-cartesian_command_in_topic: /ovis/servo_node/delta_twist_cmds # Topic for incoming Cartesian twist commands
-joint_command_in_topic: /ovis/servo_node/delta_joint_cmds # Topic for incoming joint angle commands
+cartesian_command_in_topic: ~/delta_twist_cmds # Topic for incoming Cartesian twist commands
+joint_command_in_topic: ~/delta_joint_cmds # Topic for incoming joint angle commands
 joint_topic: /ovis/joint_states
-status_topic: /ovis/status # Publish status to this topic
+status_topic: ~/status # Publish status to this topic
 command_out_topic: /ovis/arm_controller/joint_trajectory # Publish outgoing commands here
 
 ## Collision checking for the entire robot body
