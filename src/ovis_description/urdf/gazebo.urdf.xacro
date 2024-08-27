@@ -21,9 +21,6 @@
             filename="gz-sim-joint-state-publisher-system"
             name="gz::sim::systems::JointStatePublisher">
             <topic>joint_states</topic>
-            <ros>
-                <namespace>/ovis</namespace>
-            </ros>
         </plugin>
          <plugin 
             filename="gz-sim-sensors-system"
