@@ -3,18 +3,20 @@
 <robot name="ovis" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
 
-
     <xacro:include filename="$(find ovis_description)/urdf/gazebo.urdf.xacro" />
     <!-- <xacro:include filename="$(find ovis_description)/urdf/ovis.urdf.xacro" /> -->
-    <xacro:include filename="$(find ovis_description)/urdf/ovis2/urdf/ovis.urdf.xacro" />
+    <xacro:include
+        filename="$(find ovis_description)/urdf/ovis2/urdf/ovis.urdf.xacro" />
     <!-- <xacro:include filename="$(find ovis_description)/urdf/kinova_common.xacro" /> -->
-    <xacro:include filename="$(find ovis_description)/urdf/ovis2/urdf/ovis_common.xacro" />
+    <xacro:include
+        filename="$(find ovis_description)/urdf/ovis2/urdf/ovis_common.xacro" />
 
-    
-    <link name="world" />
+
+    <xacro:property name="robot_root" value="ovis_base_link" />
+    <link name="base_link" />
 
     <!-- Define the base link -->
-    <link name="base_link">
+    <link name="ovis_base_link">
         <inertial>
             <origin xyz="0 0 0" />
             <mass value="1.0" />
@@ -22,15 +24,12 @@
         </inertial>
     </link>
 
-    <!-- Attach the base_link to the world with a fixed joint -->
+    <!-- Attach the ovis_base_link to the world or rove with a fixed joint -->
     <joint name="fixed_to_world" type="fixed">
-        <parent link="world" />
-        <child link="base_link" />
-        <origin xyz="0 0 0" rpy="0 0 0" />
+        <parent link="base_link" />
+        <child link="ovis_base_link" />
+        <origin xyz="-0.2 0 0.2" rpy="0 0 0" />
     </joint>
-
-    <xacro:property name="robot_root" value="base_link" />
-
 
     <xacro:ovis base_parent="${robot_root}" />
 

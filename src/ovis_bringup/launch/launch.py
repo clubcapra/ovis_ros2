@@ -22,6 +22,8 @@ def generate_launch_description():
     # Get the launch directory
     pkg_ovis_moveit = get_package_share_directory('ovis_moveit')
 
+    namespace = '/ovis'
+
 
     # Include launch files based on the configuration
     virtual_joints_launch = IncludeLaunchDescription(
@@ -34,7 +36,7 @@ def generate_launch_description():
     robot_state_publisher = Node(
         package='robot_state_publisher',
         executable='robot_state_publisher',
-        namespace='/ovis',
+        namespace=namespace,
         name='robot_state_publisher',
         output='both',
         parameters=[

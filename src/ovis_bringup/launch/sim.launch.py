@@ -117,6 +117,14 @@ def generate_launch_description():
         output='screen'
     )
 
+    static_transform_publisher = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        name='static_transform_publisher',
+        arguments=['0', '0', '0', '0', '0', '0', 'world', 'ovis_base_link'],
+        output='screen'
+    )
+
 
     return LaunchDescription([
             RegisterEventHandler(
@@ -131,6 +139,7 @@ def generate_launch_description():
                     on_exit=[load_arm_controller],
                 )
             ),
+            # static_transform_publisher,
             robot_state_publisher,
             set_use_sim_time,
             move_group_launch,
@@ -138,5 +147,5 @@ def generate_launch_description():
             gz_sim,
             bridge,
             ovis_spawner,
-            # servo,
+            servo,
             ])

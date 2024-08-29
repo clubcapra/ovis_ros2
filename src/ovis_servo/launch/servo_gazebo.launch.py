@@ -143,7 +143,7 @@ def generate_launch_description():
                 package="tf2_ros",
                 plugin="tf2_ros::StaticTransformBroadcasterNode",
                 name="static_tf2_broadcaster",
-                parameters=[{"child_frame_id": "/ovis_link_base", "frame_id": "/base_link", "use_sim_time": True}],
+                parameters=[{"child_frame_id": "/ovis_link_base", "frame_id": "/ovis_base_link", "use_sim_time": True}],
             ),
             ComposableNode(
                 package="ovis_servo",
