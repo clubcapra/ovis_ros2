@@ -29,6 +29,20 @@ RUN apt update && apt upgrade -y
 # Install Git
 RUN apt install -y git
 
+# Install necessary packages for Gazebo Harmonic and its dependencies
+RUN apt-get update && apt-get install -y \
+    software-properties-common \
+    wget \
+    lsb-release \
+    gnupg \
+    curl
+
+# Add Gazebo Harmonic repository
+RUN wget https://packages.osrfoundation.org/gazebo.gpg -O /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg
+RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/gazebo-stable.list > /dev/null
+
+RUN apt update -y 
+
 # Change user
 RUN chown $USER_UID:$USER_GID /workspace/$USERNAME
 USER $USERNAME
@@ -36,10 +50,20 @@ USER $USERNAME
 # Copy to preload the ros packages
 COPY ./ /workspace/$USERNAME/
 
-# Rosdep update
-RUN rosdep update
-RUN rosdep install --from-paths src --ignore-src --rosdistro humble -y
-
 # Source the ROS setup file
 RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> ~/.bashrc
-RUN echo "source /gazebo/gazebo_ws/install/setup.bash" >> ~/.bashrc
+
+COPY --chown=$USERNAME ./ /workspace/$USERNAME
+
+# Add needed packages
+RUN vcs import src < ovis.repos
+
+
+# Rosdep update
+RUN rosdep update
+
+# Install ROS dependencies
+RUN rosdep install --from-paths src --ignore-src --rosdistro humble -y --skip-keys=gz-plugin2 --skip-keys=gz-sim8
+
+# Install gzharmonic after rosdep install
+RUN sudo apt install -y ros-humble-ros-gzharmonic

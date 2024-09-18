@@ -4,8 +4,6 @@ from launch import LaunchDescription
 from launch.substitutions import Command
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.actions import IncludeLaunchDescription
-from launch.actions import ExecuteProcess, IncludeLaunchDescription, RegisterEventHandler
-from launch.event_handlers import OnProcessExit
 
 from launch_ros.actions import Node
 from launch_ros.parameter_descriptions import ParameterValue
@@ -17,12 +15,10 @@ def generate_launch_description():
 
     # Get the URDF file (robot)
     urdf_path = os.path.join(moveit_pkg_path, 'config', 'ovis.urdf.xacro')
-    robot_desc = ParameterValue(Command(['xacro ', urdf_path, ' hardware_type:=', "mock"]), value_type=str)
+    robot_desc = ParameterValue(Command(['xacro ', urdf_path, ' hardware_type:=', "ovis"]), value_type=str)
 
     # Get the launch directory
     pkg_ovis_moveit = get_package_share_directory('ovis_moveit')
-
-    namespace = '/ovis'
 
 
     # Include launch files based on the configuration
@@ -36,7 +32,6 @@ def generate_launch_description():
     robot_state_publisher = Node(
         package='robot_state_publisher',
         executable='robot_state_publisher',
-        namespace=namespace,
         name='robot_state_publisher',
         output='both',
         parameters=[
@@ -61,10 +56,9 @@ def generate_launch_description():
     )
 
 
-    # Fake joint driver
-    fake_joint_driver = Node(
+    # kinova driver
+    kinova_joint_driver = Node(
         package='controller_manager',
-        namespace='/ovis',
         executable='ros2_control_node',
         parameters=[
             {'robot_description': robot_desc},
@@ -73,16 +67,10 @@ def generate_launch_description():
         ],
     )
 
-    load_joint_state_broadcaster = ExecuteProcess(
-        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
-             'joint_state_broadcaster', '-c', '/ovis/controller_manager'],
-        output='screen'
-    )
-
-    load_arm_controller = ExecuteProcess(
-        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
-             'arm_controller', '-c', '/ovis/controller_manager'],
-        output='screen'
+    spawn_controllers_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(pkg_ovis_moveit, 'launch', 'spawn_controllers.launch.py')
+        )
     )
 
     servo =  IncludeLaunchDescription(
@@ -92,22 +80,11 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
-            RegisterEventHandler(
-                event_handler=OnProcessExit(
-                    target_action=robot_state_publisher,
-                    on_exit=[load_joint_state_broadcaster],
-                )
-            ),
-            RegisterEventHandler(
-                event_handler=OnProcessExit(
-                    target_action=load_joint_state_broadcaster,
-                    on_exit=[load_arm_controller],
-                )
-            ),
             virtual_joints_launch,
             robot_state_publisher,
             move_group_launch,
             rviz_launch,
-            fake_joint_driver,
+            kinova_joint_driver,
+            spawn_controllers_launch,
             servo,
             ])

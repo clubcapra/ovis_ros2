@@ -9,6 +9,7 @@ Clone and build the repository :
 ```bash
 git clone https://github.com/clubcapra/ovis_ros2.git
 cd ovis_ros2
+vcs import src < ovis.repos
 colcon build --symlink-install
 source install/setup.bash
 ```

@@ -56,9 +56,9 @@
 #include <thread>
 
 // We'll just set up parameters here
-const std::string JOY_TOPIC = "/joy";
-const std::string TWIST_TOPIC = "/servo_node/delta_twist_cmds";
-const std::string JOINT_TOPIC = "/servo_node/delta_joint_cmds";
+const std::string JOY_TOPIC = "/ovis/joy";
+const std::string TWIST_TOPIC = "/ovis/servo_node/delta_twist_cmds";
+const std::string JOINT_TOPIC = "/ovis/servo_node/delta_joint_cmds";
 const std::string EEF_FRAME_ID = "ovis_end_effector";
 const std::string BASE_FRAME_ID = "ovis_link_base";
 
@@ -112,7 +112,6 @@ bool convertJoyToCmd(const std::vector<float>& axes, const std::vector<int>& but
   // If any joint jog command is requested, we are only publishing joint commands
   if (buttons[A] || buttons[B] || buttons[X] || buttons[Y] || axes[D_PAD_X] || axes[D_PAD_Y])
   {
-
     // Map the D_PAD to the proximal joints
     joint->joint_names.push_back("ovis_joint_1");
     joint->velocities.push_back(axes[D_PAD_X]);
@@ -123,7 +122,7 @@ bool convertJoyToCmd(const std::vector<float>& axes, const std::vector<int>& but
     joint->joint_names.push_back("ovis_joint_5");
     joint->velocities.push_back(buttons[B] - buttons[X]);
     joint->joint_names.push_back("ovis_joint_3");
-    joint->velocities.push_back(buttons[A]- buttons[Y]);
+    joint->velocities.push_back(buttons[A] - buttons[Y]);
     return false;
   }
 
@@ -181,8 +180,10 @@ public:
     servo_start_client_->async_send_request(std::make_shared<std_srvs::srv::Trigger::Request>());
 
     // Initialize gripper action client
-    gripper_action_client_ = rclcpp_action::create_client<control_msgs::action::GripperCommand>(
-        this, "/robotiq_gripper_controller/gripper_cmd");
+    gripper_action_client_ = rclcpp_action::create_client<control_msgs::action::GripperCommand>(this,
+                                                                                                "/robotiq_gripper_"
+                                                                                                "controller/"
+                                                                                                "gripper_cmd");
 
     gripper_action_client_->wait_for_action_server(std::chrono::seconds(1));
 
@@ -246,11 +247,11 @@ public:
     // Check for gripper commands
     if (msg->buttons[LEFT_STICK_CLICK])
     {
-      sendGripperCommand(1.0, 1.0); // Open gripper
+      sendGripperCommand(1.0, 1.0);  // Open gripper
     }
     else if (msg->buttons[RIGHT_STICK_CLICK])
     {
-      sendGripperCommand(0.0, 1.0); // Close gripper
+      sendGripperCommand(0.0, 1.0);  // Close gripper
     }
 
     // Convert the joystick message to Twist or JointJog and publish
@@ -277,9 +278,10 @@ public:
     goal_msg.command.max_effort = max_effort;
 
     auto send_goal_options = rclcpp_action::Client<control_msgs::action::GripperCommand>::SendGoalOptions();
-    send_goal_options.result_callback = [](const rclcpp_action::ClientGoalHandle<control_msgs::action::GripperCommand>::WrappedResult & result) {
-      // Handle result here
-    };
+    send_goal_options.result_callback =
+        [](const rclcpp_action::ClientGoalHandle<control_msgs::action::GripperCommand>::WrappedResult& result) {
+          // Handle result here
+        };
 
     gripper_action_client_->async_send_goal(goal_msg, send_goal_options);
   }

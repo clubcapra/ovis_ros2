@@ -1,27 +1,69 @@
 import os
-
-from ament_index_python.packages import get_package_share_directory
+from ament_index_python import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import IncludeLaunchDescription
-
+from launch.actions import ExecuteProcess, IncludeLaunchDescription, RegisterEventHandler
+from launch.event_handlers import OnProcessExit
+from launch.substitutions import Command 
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import Command
-from launch_ros.actions import Node
-from launch_ros.parameter_descriptions import ParameterValue
-from launch.actions import DeclareLaunchArgument
 
+from launch_ros.actions import Node, SetParameter
+from launch_ros.parameter_descriptions import ParameterValue
 
 def generate_launch_description():
-    # Configure ROS nodes for launch
-
     # Get the launch directory
-    pkg_ovis_bringup = get_package_share_directory('ovis_bringup')
     pkg_ovis_description = get_package_share_directory('ovis_description')
+    bringup_pkg_path = get_package_share_directory('ovis_bringup')
+    moveit_pkg_path = get_package_share_directory('ovis_moveit')
     pkg_ros_gz_sim = get_package_share_directory('ros_gz_sim')
+    pkg_ovis_servo = get_package_share_directory('ovis_servo')
 
-    # Get the URDF file
+    # Get the URDF file (robot)
+    urdf_path = os.path.join(moveit_pkg_path, 'config', 'ovis.urdf.xacro')
+    robot_desc = ParameterValue(Command(['xacro ', urdf_path, ' hardware_type:=', "gazebo"]), value_type=str)
+
+    # Get the URDF file (world)
     world_file_name = 'worlds/base_world.world'
     world = os.path.join(pkg_ovis_description, world_file_name)
+
+    # Get the launch directory
+    pkg_ovis_moveit = get_package_share_directory('ovis_moveit')
+
+    namespace = '/ovis'
+
+    # Takes the description and joint angles as inputs and publishes
+    robot_state_publisher = Node(
+        package='robot_state_publisher',
+        executable='robot_state_publisher',
+        name='robot_state_publisher',
+        namespace=namespace,
+        output='both',
+        parameters=[
+            {'robot_description': robot_desc},
+            {"use_sim_time": True }
+        ]
+    )
+
+    move_group_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(pkg_ovis_moveit, 'launch', 'move_group.launch.py'),
+        ),
+    )
+
+    # Set the use_sim_time parameter to true for the entire system
+    # Move group doesn't accept use sim time as an argument, we need to manually call it or use SetParameter
+    set_use_sim_time = SetParameter(
+        name='use_sim_time',
+        value='true',
+    )
+
+    rviz_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(pkg_ovis_moveit, 'launch', 'moveit_rviz.launch.py')
+        ),
+        launch_arguments={
+            "use_sim_time": "true",
+        }.items(),
+    )
 
     # Setup to launch the simulator and Gazebo world
     gz_sim = IncludeLaunchDescription(
@@ -30,12 +72,13 @@ def generate_launch_description():
         launch_arguments={'gz_args': "-v 4 -r " + world}.items(),
     )
 
-    # Spawn robot
-    create = Node(
+    # Spawn ovis (robot arm)
+    ovis_spawner = Node(
         package='ros_gz_sim',
+        # namespace=namespace,
         executable='create',
         arguments=['-name', 'ovis',
-                   '-topic', 'robot_description',
+                   '-topic', '/ovis/robot_description',
                    '-x', '0',
                    '-y', '0',
                    '-z', '0.1',
@@ -56,16 +99,53 @@ def generate_launch_description():
         output='screen'
     )
 
-    # Include common launch configuration
-    common = IncludeLaunchDescription(
+    servo =  IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(pkg_ovis_bringup, "launch", "common.launch.py"),
-        ),
+            os.path.join(pkg_ovis_servo, 'launch', 'servo.launch.py')
+        )
     )
 
+    load_joint_state_broadcaster = ExecuteProcess(
+        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
+             'joint_state_broadcaster', '-c', '/ovis/controller_manager'],
+        output='screen'
+    )
+
+    load_arm_controller = ExecuteProcess(
+        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
+             'arm_controller', '-c', '/ovis/controller_manager'],
+        output='screen'
+    )
+
+    static_transform_publisher = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        name='static_transform_publisher',
+        arguments=['0', '0', '0', '0', '0', '0', 'world', 'ovis_base_link'],
+        output='screen'
+    )
+
+
     return LaunchDescription([
+            RegisterEventHandler(
+                event_handler=OnProcessExit(
+                    target_action=ovis_spawner,
+                    on_exit=[load_joint_state_broadcaster],
+                )
+            ),
+            RegisterEventHandler(
+                event_handler=OnProcessExit(
+                    target_action=load_joint_state_broadcaster,
+                    on_exit=[load_arm_controller],
+                )
+            ),
+            # static_transform_publisher,
+            robot_state_publisher,
+            set_use_sim_time,
+            move_group_launch,
+            rviz_launch,
             gz_sim,
             bridge,
-            create,
-            #common,
+            ovis_spawner,
+            servo,
             ])
