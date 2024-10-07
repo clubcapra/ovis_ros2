@@ -1,10 +1,13 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="ovis">
     <xacro:arg name="initial_positions_file" default="initial_positions.yaml" />
-    <xacro:arg name="hardware_type" default="ovis" />
+    <xacro:arg name="hardware_type" default="real" />
+    <xacro:arg name="version" default="ovis2" />
+
+
 
     <!-- Import ovis urdf file -->
-    <xacro:include filename="$(find ovis_description)/urdf/ovis_standalone.urdf.xacro" />
+    <xacro:include filename="$(find ovis_description)/urdf/$(version)/ovis_standalone.urdf.xacro"/>
 
     <!-- Import control_xacro -->
     <xacro:include filename="ovis.ros2_control.xacro" />

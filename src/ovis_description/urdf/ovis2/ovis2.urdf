@@ -49,7 +49,7 @@
     <collision name="ovis2_base_col">
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="file://$(find ovis_description)/urdf/ovis2/meshes/collision/ovis_base.stl" scale="1 1 1"/>
+        <mesh filename="file://$(find ovis_description)/meshes/ovis2/collision/ovis_base.stl" scale="1 1 1"/>
       </geometry>
     </collision>
     <inertial>
@@ -61,7 +61,7 @@
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <material name="Opaque(128,128,128)"/>
       <geometry>
-        <mesh filename="file://$(find ovis_description)/urdf/ovis2/meshes/collision/ovis_base.stl" scale="1 1 1"/>
+        <mesh filename="file://$(find ovis_description)/meshes/ovis2/collision/ovis_base.stl" scale="1 1 1"/>
       </geometry>
     </visual>
   </link>
@@ -71,7 +71,7 @@
     <collision name="ovis2_j12_col">
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="file://$(find ovis_description)/urdf/ovis2/meshes/collision/ovis_j12.stl" scale="1 1 1"/>
+        <mesh filename="file://$(find ovis_description)/meshes/ovis2/collision/ovis_j12.stl" scale="1 1 1"/>
       </geometry>
     </collision>
     <inertial>
@@ -83,7 +83,7 @@
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <material name="Opaque(128,128,128)"/>
       <geometry>
-        <mesh filename="file://$(find ovis_description)/urdf/ovis2/meshes/collision/ovis_j12.stl" scale="1 1 1"/>
+        <mesh filename="file://$(find ovis_description)/meshes/ovis2/collision/ovis_j12.stl" scale="1 1 1"/>
       </geometry>
     </visual>
   </link>
@@ -93,7 +93,7 @@
     <collision name="ovis2_j23_col">
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="file://$(find ovis_description)/urdf/ovis2/meshes/collision/ovis_j23.stl" scale="1 1 1"/>
+        <mesh filename="file://$(find ovis_description)/meshes/ovis2/collision/ovis_j23.stl" scale="1 1 1"/>
       </geometry>
     </collision>
     <inertial>
@@ -105,7 +105,7 @@
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <material name="Aluminum_-_Satin"/>
       <geometry>
-        <mesh filename="file://$(find ovis_description)/urdf/ovis2/meshes/collision/ovis_j23.stl" scale="1 1 1"/>
+        <mesh filename="file://$(find ovis_description)/meshes/ovis2/collision/ovis_j23.stl" scale="1 1 1"/>
       </geometry>
     </visual>
   </link>
@@ -115,7 +115,7 @@
     <collision name="ovis2_j34_col">
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="file://$(find ovis_description)/urdf/ovis2/meshes/collision/ovis_j34.stl" scale="1 1 1"/>
+        <mesh filename="file://$(find ovis_description)/meshes/ovis2/collision/ovis_j34.stl" scale="1 1 1"/>
       </geometry>
     </collision>
     <inertial>
@@ -127,7 +127,7 @@
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <material name="Opaque(128,128,128)"/>
       <geometry>
-        <mesh filename="file://$(find ovis_description)/urdf/ovis2/meshes/collision/ovis_j34.stl" scale="1 1 1"/>
+        <mesh filename="file://$(find ovis_description)/meshes/ovis2/collision/ovis_j34.stl" scale="1 1 1"/>
       </geometry>
     </visual>
   </link>
@@ -137,7 +137,7 @@
     <collision name="ovis2_j45_col">
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="file://$(find ovis_description)/urdf/ovis2/meshes/collision/ovis_j45.stl" scale="1 1 1"/>
+        <mesh filename="file://$(find ovis_description)/meshes/ovis2/collision/ovis_j45.stl" scale="1 1 1"/>
       </geometry>
     </collision>
     <inertial>
@@ -149,7 +149,7 @@
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <material name="Opaque(128,128,128)"/>
       <geometry>
-        <mesh filename="file://$(find ovis_description)/urdf/ovis2/meshes/collision/ovis_j45.stl" scale="1 1 1"/>
+        <mesh filename="file://$(find ovis_description)/meshes/ovis2/collision/ovis_j45.stl" scale="1 1 1"/>
       </geometry>
     </visual>
   </link>
@@ -159,7 +159,7 @@
     <collision name="ovis2_j56_col">
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="file://$(find ovis_description)/urdf/ovis2/meshes/collision/ovis_j56.stl" scale="1 1 1"/>
+        <mesh filename="file://$(find ovis_description)/meshes/ovis2/collision/ovis_j56.stl" scale="1 1 1"/>
       </geometry>
     </collision>
     <inertial>
@@ -171,7 +171,7 @@
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <material name="Opaque(128,128,128)"/>
       <geometry>
-        <mesh filename="file://$(find ovis_description)/urdf/ovis2/meshes/collision/ovis_j56.stl" scale="1 1 1"/>
+        <mesh filename="file://$(find ovis_description)/meshes/ovis2/collision/ovis_j56.stl" scale="1 1 1"/>
       </geometry>
     </visual>
   </link>
@@ -181,7 +181,7 @@
     <collision name="ovis2_end_effector_col">
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="file://$(find ovis_description)/urdf/ovis2/meshes/collision/ovis_end_effector.stl" scale="1 1 1"/>
+        <mesh filename="file://$(find ovis_description)/meshes/ovis2/collision/ovis_end_effector.stl" scale="1 1 1"/>
       </geometry>
     </collision>
     <inertial>
@@ -193,7 +193,7 @@
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <material name="Opaque(128,128,128)"/>
       <geometry>
-        <mesh filename="file://$(find ovis_description)/urdf/ovis2/meshes/collision/ovis_end_effector.stl" scale="1 1 1"/>
+        <mesh filename="file://$(find ovis_description)/meshes/ovis2/collision/ovis_end_effector.stl" scale="1 1 1"/>
       </geometry>
     </visual>
   </link>

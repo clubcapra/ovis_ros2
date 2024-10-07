@@ -11,7 +11,7 @@
         <xacro:if value="${hardware_type == 'mock'}">
           <plugin>mock_components/GenericSystem</plugin>
         </xacro:if>
-        <xacro:if value="${hardware_type == 'ovis'}">
+        <xacro:if value="${hardware_type == 'real'}">
           <plugin>ovis_control/OvisHWInterface</plugin>
           <param name="api_type">ETHERNET</param>
           <param name="local_machine_IP">192.168.84.15</param>

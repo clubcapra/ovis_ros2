@@ -15,33 +15,42 @@
     xmlns:physics="http://playerstage.sourceforge.net/gazebo/xmlschema/#physics"
 	xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-<!-- <xacro:include filename="$(find ovis_description)/urdf/kinova_inertial.xacro" /> -->
-
+<xacro:include filename="$(find ovis_description)/urdf/ovis2/kinova_inertial.xacro" />
 
 
     <xacro:property name="J_PI" value="3.1415926535897931" />
 
     <xacro:macro name="kinova_armlink" params="link_name link_mesh ring_mesh:=ring_big use_ring_mesh:=false mesh_no">
         <link name="${link_name}">
-            <visual name="${link_name}_vis">
+            <visual>
                 <geometry>
-                    <mesh filename="file://$(find ovis_description)/urdf/ovis2/meshes/visual/${link_mesh}.stl"/>
+                    <mesh
+                        filename="file://$(find ovis_description)/meshes/ovis2/${link_mesh}.stl"/>
                 </geometry>
                 <material name="carbon_fiber">
                     <color rgba="0.792156862745098 0 0 1" />
                 </material>
             </visual>
-            <collision name="${link_name}_col">
+
+	    <!-- Adding ring to the model -->
+	         <xacro:if value="${use_ring_mesh}">
+	           <visual>
                 <geometry>
-                    <mesh filename="file://$(find ovis_description)/urdf/ovis2/meshes/collision/${link_mesh}.stl"/>
+                    <mesh
+                        filename="$(find ovis_description)/meshes/ovis2/${ring_mesh}.stl"/>
+                </geometry>
+             </visual>
+	    </xacro:if>
+
+            <collision>
+                <geometry>
+                    <mesh
+                        filename="$(find ovis_description)/meshes/ovis2/${link_mesh}.stl"/>
                 </geometry>
             </collision>
-            <inertial>
-                <inertia ixx="0.00001" ixy="0.00000" ixz="0.00000" iyy="0.00001" iyz="0.00000" izz="0.00001"/>
-                <origin rpy="0.00000 0.00000 0.00000" xyz="0.00000 0.00000 0.00000"/>
-                <mass value="0.1"/>
-            </inertial>
-        </link>
+						<xacro:kinova_inertial mesh_no="${mesh_no}"/>
+      </link>
+
     </xacro:macro>
 
   <!--
@@ -103,7 +112,7 @@
         <provideFeedback>true</provideFeedback>
       </gazebo>
       <gazebo>
-        <plugin filename="gz-sim-forcetorque-system" name="gz::sim::systems::ForceTorque">
+        <plugin name="gz::sim::systems::ForceTorque" filename="gz-sim-forcetorque-system">
           <updateRate>30.0</updateRate>
           <topicName>${joint_name}_ft_sensor_topic</topicName>
           <jointName>${joint_name}</jointName>

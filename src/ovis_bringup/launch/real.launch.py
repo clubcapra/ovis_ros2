@@ -15,7 +15,7 @@ def generate_launch_description():
 
     # Get the URDF file (robot)
     urdf_path = os.path.join(moveit_pkg_path, 'config', 'ovis.urdf.xacro')
-    robot_desc = ParameterValue(Command(['xacro ', urdf_path, ' hardware_type:=', "ovis"]), value_type=str)
+    robot_desc = ParameterValue(Command(['xacro ', urdf_path, ' hardware_type:=', "real"]), value_type=str)
 
     # Get the launch directory
     pkg_ovis_moveit = get_package_share_directory('ovis_moveit')
