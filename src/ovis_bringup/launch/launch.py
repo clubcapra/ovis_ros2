@@ -1,12 +1,10 @@
 import os
 from ament_index_python import get_package_share_directory
 from launch import LaunchDescription
-from launch.substitutions import Command
+from launch.substitutions import Command, PathJoinSubstitution
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.actions import IncludeLaunchDescription
-from launch.actions import ExecuteProcess, IncludeLaunchDescription, RegisterEventHandler
+from launch.actions import IncludeLaunchDescription, ExecuteProcess, RegisterEventHandler
 from launch.event_handlers import OnProcessExit
-
 from launch_ros.actions import Node
 from launch_ros.parameter_descriptions import ParameterValue
 
@@ -24,14 +22,6 @@ def generate_launch_description():
 
     namespace = '/ovis'
 
-
-    # Include launch files based on the configuration
-    virtual_joints_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(pkg_ovis_moveit, 'launch', 'static_virtual_joint_tfs.launch.py')
-        )
-    )
-
     # Takes the description and joint angles as inputs and publishes
     robot_state_publisher = Node(
         package='robot_state_publisher',
@@ -41,48 +31,61 @@ def generate_launch_description():
         output='both',
         parameters=[
             {'robot_description': robot_desc},
-            {"use_sim_time": True, }
+            {"use_sim_time": False}
         ]
     )
-
-    move_group_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(pkg_ovis_moveit, 'launch', 'move_group.launch.py'),
-        ),
-        launch_arguments={
-            "use_sim_time": "true",
-        }.items(),
-    )
-
-    rviz_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(pkg_ovis_moveit, 'launch', 'moveit_rviz.launch.py')
-        ),
-    )
-
 
     # Fake joint driver
     fake_joint_driver = Node(
         package='controller_manager',
-        namespace='/ovis',
         executable='ros2_control_node',
+        namespace=namespace,
         parameters=[
             {'robot_description': robot_desc},
             os.path.join(pkg_ovis_moveit, 'config', 'ros2_controllers.yaml'),
+        ],
+        output='screen'
+    )
 
+    joint_state_broadcaster_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        namespace=namespace,
+        arguments=[
+            "joint_state_broadcaster",
+            "--controller-manager",
+            f"{namespace}/controller_manager",
         ],
     )
 
-    load_joint_state_broadcaster = ExecuteProcess(
-        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
-             'joint_state_broadcaster', '-c', '/ovis/controller_manager'],
-        output='screen'
+    arm_controller_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        namespace=namespace,
+        arguments=[
+            "arm_controller",
+            "--controller-manager",
+            f"{namespace}/controller_manager",
+        ],
     )
 
-    load_arm_controller = ExecuteProcess(
-        cmd=['ros2', 'control', 'load_controller', '--set-state', 'active',
-             'arm_controller', '-c', '/ovis/controller_manager'],
-        output='screen'
+    # Static TF
+    static_tf = Node(
+        package="tf2_ros",
+        executable="static_transform_publisher",
+        name="static_transform_publisher",
+        output="log",
+        arguments=["0.0", "0.0", "0.0", "0.0", "0.0", "0.0", "world", "base_link"],
+    )
+
+    move_group_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(pkg_ovis_moveit, 'launch', 'move_group.launch.py')
+        ),
+        launch_arguments={
+            'namespace': namespace,
+            'use_sim_time': 'false',
+        }.items(),
     )
 
     servo =  IncludeLaunchDescription(
@@ -91,23 +94,23 @@ def generate_launch_description():
         )
     )
 
+    rviz_launch = IncludeLaunchDescription(
+        PythonLaunchDescriptionSource(
+            os.path.join(pkg_ovis_moveit, 'launch', 'moveit_rviz.launch.py')
+        ),
+        launch_arguments={
+            'namespace': namespace,
+            'rviz_config': os.path.join(pkg_ovis_moveit, 'config', 'moveit.rviz'),
+        }.items(),
+    )
+
     return LaunchDescription([
-            RegisterEventHandler(
-                event_handler=OnProcessExit(
-                    target_action=robot_state_publisher,
-                    on_exit=[load_joint_state_broadcaster],
-                )
-            ),
-            RegisterEventHandler(
-                event_handler=OnProcessExit(
-                    target_action=load_joint_state_broadcaster,
-                    on_exit=[load_arm_controller],
-                )
-            ),
-            virtual_joints_launch,
-            robot_state_publisher,
-            move_group_launch,
-            rviz_launch,
-            fake_joint_driver,
-            servo,
-            ])
+        static_tf,
+        robot_state_publisher,
+        fake_joint_driver,
+        joint_state_broadcaster_spawner,
+        arm_controller_spawner,
+        move_group_launch,
+        rviz_launch,
+        servo
+    ])
