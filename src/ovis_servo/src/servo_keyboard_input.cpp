@@ -67,8 +67,8 @@
 #define KEYCODE_R 0x72
 
 // Some constants used in the Servo Teleop demo
-const std::string TWIST_TOPIC = "/servo_node/delta_twist_cmds";
-const std::string JOINT_TOPIC = "/servo_node/delta_joint_cmds";
+const std::string TWIST_TOPIC = "/ovis/servo_node/delta_twist_cmds";
+const std::string JOINT_TOPIC = "/ovis/servo_node/delta_joint_cmds";
 const size_t ROS_QUEUE_SIZE = 10;
 const std::string EEF_FRAME_ID = "ovis_end_effector";
 const std::string BASE_FRAME_ID = "ovis_link_base";

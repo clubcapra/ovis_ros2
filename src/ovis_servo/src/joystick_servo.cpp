@@ -55,7 +55,7 @@
 #include <rclcpp/utilities.hpp>
 #include <thread>
 
-// We'll just set up parameters here
+// Default topic
 const std::string JOY_TOPIC = "/ovis/joy";
 const std::string TWIST_TOPIC = "/ovis/servo_node/delta_twist_cmds";
 const std::string JOINT_TOPIC = "/ovis/servo_node/delta_joint_cmds";
