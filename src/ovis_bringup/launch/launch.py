@@ -5,7 +5,7 @@ from launch.substitutions import Command, PathJoinSubstitution
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch.actions import IncludeLaunchDescription, ExecuteProcess, RegisterEventHandler
 from launch.event_handlers import OnProcessExit
-from launch_ros.actions import Node
+from launch_ros.actions import Node, SetParameter
 from launch_ros.parameter_descriptions import ParameterValue
 
 def generate_launch_description():
@@ -105,6 +105,7 @@ def generate_launch_description():
     )
 
     return LaunchDescription([
+        SetParameter(name='use_sim_time', value=False),
         static_tf,
         robot_state_publisher,
         fake_joint_driver,
