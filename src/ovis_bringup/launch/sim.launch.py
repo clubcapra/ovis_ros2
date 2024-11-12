@@ -12,10 +12,10 @@ from launch_ros.parameter_descriptions import ParameterValue
 def generate_launch_description():
     # Get the launch directory
     pkg_ovis_description = get_package_share_directory('ovis_description')
-    bringup_pkg_path = get_package_share_directory('ovis_bringup')
     moveit_pkg_path = get_package_share_directory('ovis_moveit')
     pkg_ros_gz_sim = get_package_share_directory('ros_gz_sim')
     pkg_ovis_servo = get_package_share_directory('ovis_servo')
+    pkg_ovis_moveit = get_package_share_directory('ovis_moveit')
 
     # Get the URDF file (robot)
     urdf_path = os.path.join(moveit_pkg_path, 'config', 'ovis.urdf.xacro')
@@ -25,8 +25,6 @@ def generate_launch_description():
     world_file_name = 'worlds/base_world.world'
     world = os.path.join(pkg_ovis_description, world_file_name)
 
-    # Get the launch directory
-    pkg_ovis_moveit = get_package_share_directory('ovis_moveit')
 
     namespace = '/ovis'
 
@@ -47,13 +45,6 @@ def generate_launch_description():
         PythonLaunchDescriptionSource(
             os.path.join(pkg_ovis_moveit, 'launch', 'move_group.launch.py'),
         ),
-    )
-
-    # Set the use_sim_time parameter to true for the entire system
-    # Move group doesn't accept use sim time as an argument, we need to manually call it or use SetParameter
-    set_use_sim_time = SetParameter(
-        name='use_sim_time',
-        value='true',
     )
 
     rviz_launch = IncludeLaunchDescription(
@@ -117,16 +108,18 @@ def generate_launch_description():
         output='screen'
     )
 
-    static_transform_publisher = Node(
-        package='tf2_ros',
-        executable='static_transform_publisher',
-        name='static_transform_publisher',
-        arguments=['0', '0', '0', '0', '0', '0', 'world', 'ovis_base_link'],
-        output='screen'
+    static_tf = Node(
+        package="tf2_ros",
+        executable="static_transform_publisher",
+        name="static_transform_publisher",
+        output="screen",
+        arguments=["0.0", "0.0", "0.0", "0.0", "0.0", "0.0", "world", "base_link"],
     )
 
 
     return LaunchDescription([
+            SetParameter(name='use_sim_time', value=True),
+            static_tf,
             RegisterEventHandler(
                 event_handler=OnProcessExit(
                     target_action=ovis_spawner,
@@ -139,9 +132,7 @@ def generate_launch_description():
                     on_exit=[load_arm_controller],
                 )
             ),
-            # static_transform_publisher,
             robot_state_publisher,
-            set_use_sim_time,
             move_group_launch,
             rviz_launch,
             gz_sim,

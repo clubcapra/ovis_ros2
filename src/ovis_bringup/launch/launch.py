@@ -31,7 +31,6 @@ def generate_launch_description():
         output='both',
         parameters=[
             {'robot_description': robot_desc},
-            {"use_sim_time": False}
         ]
     )
 
@@ -84,7 +83,6 @@ def generate_launch_description():
         ),
         launch_arguments={
             'namespace': namespace,
-            'use_sim_time': 'false',
         }.items(),
     )
 
@@ -113,5 +111,5 @@ def generate_launch_description():
         arm_controller_spawner,
         move_group_launch,
         rviz_launch,
-        servo
+        # servo
     ])
