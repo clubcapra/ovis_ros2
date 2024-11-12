@@ -19,6 +19,12 @@ def generate_launch_description():
         description='Set to "true" to disable gz_sim, bridge, and rviz_launch nodes.'
     )
 
+    declare_with_joy_arg = DeclareLaunchArgument(
+        'with_joy',
+        default_value='true',
+        description='Set to "false" to disable joy node.'
+    )
+
     # Retrieve package directories
     pkg_ovis_description = get_package_share_directory('ovis_description')
     moveit_pkg_path = get_package_share_directory('ovis_moveit')
@@ -119,6 +125,7 @@ def generate_launch_description():
 
     return LaunchDescription([
             declare_with_rove_arg,
+            declare_with_joy_arg,
             SetParameter(name='use_sim_time', value=True),
             static_tf,
             RegisterEventHandler(

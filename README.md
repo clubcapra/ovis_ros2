@@ -11,6 +11,9 @@ git clone https://github.com/clubcapra/ovis_ros2.git
 cd ovis_ros2
 echo "export GZ_VERSION=harmonic" >> ~/.bashrc && source ~/.bashrc
 vcs import src < ovis.repos
+sudo rosdep init
+rosdep update
+rosdep install --from-paths src --ignore-src -r -y
 colcon build --symlink-install
 source install/setup.bash
 ```

@@ -8,8 +8,9 @@ from launch_ros.descriptions import ComposableNode
 from moveit_configs_utils import MoveItConfigsBuilder
 from launch.actions import ExecuteProcess
 from launch.actions import RegisterEventHandler
+from launch.conditions import IfCondition
 from launch.event_handlers import OnProcessStart
-
+from launch.substitutions import Command, LaunchConfiguration, PythonExpression
 
 def load_file(package_name, file_path):
     package_path = get_package_share_directory(package_name)
@@ -80,6 +81,7 @@ def generate_launch_description():
                 namespace="/ovis",
                 plugin="joy::Joy",
                 name="joy_node",
+                condition=IfCondition(LaunchConfiguration('with_joy'))
             ),
         ],
         output="screen",
