@@ -25,13 +25,7 @@ def generate_launch_description():
         description='Set to "false" to disable joy node.'
     )
 
-    # Declare separate parameters for each pose component
-    declare_x = DeclareLaunchArgument('x_pos', default_value='0.0')
-    declare_y = DeclareLaunchArgument('y_pos', default_value='0.0')
-    declare_z = DeclareLaunchArgument('z_pos', default_value='2.1')
-    declare_R = DeclareLaunchArgument('roll', default_value='0.0')
-    declare_P = DeclareLaunchArgument('pitch', default_value='0.0')
-    declare_Y = DeclareLaunchArgument('yaw', default_value='0.0')
+
 
     # Retrieve package directories
     pkg_ovis_description = get_package_share_directory('ovis_description')
@@ -94,20 +88,16 @@ def generate_launch_description():
         condition=IfCondition(PythonExpression(["'", LaunchConfiguration('with_rove'), "' == 'false'"]))
     )
 
-    # Update the ovis_spawner node
+    
     ovis_spawner = Node(
         package='ros_gz_sim',
         executable='create',
         arguments=['-name', 'ovis',
-                  '-topic', '/ovis/robot_description',
-                  '-x', LaunchConfiguration('x_pos'),
-                  '-y', LaunchConfiguration('y_pos'),
-                  '-z', LaunchConfiguration('z_pos'),
-                  '-R', LaunchConfiguration('roll'),
-                  '-P', LaunchConfiguration('pitch'),
-                  '-Y', LaunchConfiguration('yaw')],
-        output='screen',
-        condition=IfCondition(PythonExpression(["'", LaunchConfiguration('with_rove'), "' == 'false'"]))
+                   '-topic', '/ovis/robot_description',
+                   '-x', '0',
+                   '-y', '0',
+                   '-z', '0.1'],
+        output='screen'
     )
 
     servo = IncludeLaunchDescription(
@@ -139,12 +129,6 @@ def generate_launch_description():
     return LaunchDescription([
             declare_with_rove_arg,
             declare_with_joy_arg,
-            declare_x,
-            declare_y,
-            declare_z,
-            declare_R,
-            declare_P,
-            declare_Y,
             SetParameter(name='use_sim_time', value=True),
             static_tf,
             RegisterEventHandler(
