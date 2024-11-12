@@ -2,14 +2,19 @@
 <robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="ovis">
     <xacro:arg name="initial_positions_file" default="initial_positions.yaml" />
     <xacro:arg name="hardware_type" default="ovis" />
+    <xacro:arg name="ovis_base_origin" default="0 0 0 0 0 0" />
 
     <!-- Import ovis urdf file -->
     <xacro:include filename="$(find ovis_description)/urdf/ovis_standalone.urdf.xacro" />
 
+    <!-- Pass the argument as a property -->
+    <xacro:property name="ovis_base_origin" value="$(arg ovis_base_origin)" />
+
     <!-- Import control_xacro -->
     <xacro:include filename="ovis.ros2_control.xacro" />
 
-
-    <xacro:ovis_ros2_control name="FakeSystem" initial_positions_file="$(arg initial_positions_file)" hardware_type="$(arg hardware_type)"/>
+    <xacro:ovis_ros2_control name="FakeSystem"
+        initial_positions_file="$(arg initial_positions_file)"
+        hardware_type="$(arg hardware_type)" />
 
 </robot>

@@ -25,6 +25,12 @@ def generate_launch_description():
         description='Set to "false" to disable joy node.'
     )
 
+    declare_ovis_origin = DeclareLaunchArgument(
+        'ovis_base_origin',
+        default_value='-0.2 0 0.2 0 0 1.57',
+        description='Base origin as "x y z roll pitch yaw"'
+    )
+
 
 
     # Retrieve package directories
@@ -36,7 +42,10 @@ def generate_launch_description():
 
     # Define paths to URDF and world files
     urdf_path = os.path.join(moveit_pkg_path, 'config', 'ovis.urdf.xacro')
-    robot_desc = ParameterValue(Command(['xacro ', urdf_path, ' hardware_type:=', "gazebo"]), value_type=str)
+    robot_desc = ParameterValue(Command(['xacro ', urdf_path,
+        ' hardware_type:=', 'gazebo',
+        ' ovis_base_origin:="', LaunchConfiguration('ovis_base_origin'), '"'
+    ]), value_type=str)
     world_file_name = 'worlds/base_world.world'
     world = os.path.join(pkg_ovis_description, world_file_name)
 
@@ -93,10 +102,7 @@ def generate_launch_description():
         package='ros_gz_sim',
         executable='create',
         arguments=['-name', 'ovis',
-                   '-topic', '/ovis/robot_description',
-                   '-x', '0',
-                   '-y', '0',
-                   '-z', '0.1'],
+                   '-topic', '/ovis/robot_description'],
         output='screen'
     )
 
@@ -129,6 +135,7 @@ def generate_launch_description():
     return LaunchDescription([
             declare_with_rove_arg,
             declare_with_joy_arg,
+            declare_ovis_origin,
             SetParameter(name='use_sim_time', value=True),
             static_tf,
             RegisterEventHandler(

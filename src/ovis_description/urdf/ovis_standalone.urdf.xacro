@@ -2,7 +2,7 @@
 
 <robot name="ovis" xmlns:xacro="http://www.ros.org/wiki/xacro">
 
-    <xacro:property name="ovis_base_origin" value="-0.2 0 0.2 0 0 0" />
+    <xacro:property name="ovis_base_origin" value="$(arg ovis_base_origin)" />
 
     <xacro:include filename="$(find ovis_description)/urdf/gazebo.urdf.xacro" />
     <xacro:include filename="$(find ovis_description)/urdf/ovis2/urdf/ovis.urdf.xacro" />
@@ -19,7 +19,7 @@
         </inertial>
     </link>
 
-    <joint name="fixe_to_base" type="fixed">
+    <joint name="fixed_to_world" type="fixed">
         <parent link="base_link" />
         <child link="ovis_base_link" />
         <xacro:property name="origin_parts" value="${ovis_base_origin.split()}" />
