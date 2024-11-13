@@ -68,15 +68,6 @@ def generate_launch_description():
         ],
     )
 
-    # Static TF
-    static_tf = Node(
-        package="tf2_ros",
-        executable="static_transform_publisher",
-        name="static_transform_publisher",
-        output="log",
-        arguments=["0.0", "0.0", "0.0", "0.0", "0.0", "0.0", "world", "base_link"],
-    )
-
     move_group_launch = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
             os.path.join(pkg_ovis_moveit, 'launch', 'move_group.launch.py')
@@ -104,12 +95,11 @@ def generate_launch_description():
 
     return LaunchDescription([
         SetParameter(name='use_sim_time', value=False),
-        static_tf,
         robot_state_publisher,
         fake_joint_driver,
         joint_state_broadcaster_spawner,
         arm_controller_spawner,
         move_group_launch,
         rviz_launch,
-        # servo
+        # servo # Uncomment this line to enable the servo (gamepad control)
     ])

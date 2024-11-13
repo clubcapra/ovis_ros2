@@ -47,7 +47,7 @@ are defined
     <!--VIRTUAL
     JOINT: Purpose: this element defines a virtual joint between a robot link and an external frame
     of reference (considered fixed with respect to the robot)-->
-    <virtual_joint name="virtual_joint" type="fixed" parent_frame="world"
+    <virtual_joint name="virtual_joint" type="fixed" parent_frame="base_link"
         child_link="ovis_base_link" />
 
     <!-- Disable collisions between all links -->

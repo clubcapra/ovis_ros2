@@ -27,7 +27,7 @@ def generate_launch_description():
 
     declare_ovis_origin = DeclareLaunchArgument(
         'ovis_base_origin',
-        default_value='-0.2 0 0.2 0 0 1.57',
+        default_value='0.2 0 0.3 0 0 3.14',
         description='Base origin as "x y z roll pitch yaw"'
     )
 
@@ -124,20 +124,11 @@ def generate_launch_description():
         output='screen'
     )
 
-    static_tf = Node(
-        package="tf2_ros",
-        executable="static_transform_publisher",
-        name="static_transform_publisher",
-        output="screen",
-        arguments=["0.0", "0.0", "0.0", "0.0", "0.0", "0.0", "world", "base_link"],
-    )
-
     return LaunchDescription([
             declare_with_rove_arg,
             declare_with_joy_arg,
             declare_ovis_origin,
             SetParameter(name='use_sim_time', value=True),
-            static_tf,
             RegisterEventHandler(
                 event_handler=OnProcessExit(
                     target_action=ovis_spawner,
@@ -156,6 +147,6 @@ def generate_launch_description():
             gz_sim,
             bridge,
             ovis_spawner,
-            servo,
+            servo, # Comment this to allow rviz trajectory planner instead of gamepad
             ])
 
