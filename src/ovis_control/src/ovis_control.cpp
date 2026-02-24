@@ -271,7 +271,6 @@ TEMPLATES__ROS2_CONTROL__VISIBILITY_PUBLIC std::vector<hardware_interface::State
         const std::vector<std::string> &start_interfaces,
         const std::vector<std::string> &stop_interfaces)
     {
-        control_level_ = integration_level_t::VELOCITY;
         // Prepare for new command modes
         // std::vector<integration_level_t> new_modes = {};
         // for (std::string key : start_interfaces)
