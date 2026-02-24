@@ -14,10 +14,12 @@ set(THIS_PACKAGE_INCLUDE_DEPENDS
   angles
   tf2
   tf2_ros
+  ros2_control_test_assets
 )
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
+find_package(ament_cmake_gmock REQUIRED)
 foreach(Dependency IN ITEMS ${THIS_PACKAGE_INCLUDE_DEPENDS})
   find_package(${Dependency} REQUIRED)
 endforeach()
@@ -95,16 +97,16 @@ install(
 
 
 
-# if(BUILD_TESTING)
-#   ament_add_gmock(test_ovis_control test/test_ovis_control.cpp)
-#   target_include_directories(test_ovis_control PRIVATE include)
-#   ament_target_dependencies(
-#     test_ovis_control
-#     hardware_interface
-#     pluginlib
-#     ros2_control_test_assets
-#   )
-# endif()
+if(BUILD_TESTING)
+  ament_add_gmock(test_ovis_control test/test_ovis_control.cpp)
+  target_include_directories(test_ovis_control PRIVATE include)
+  ament_target_dependencies(
+    test_ovis_control
+    hardware_interface
+    pluginlib
+    ros2_control_test_assets
+  )
+endif()
 
 ament_export_include_directories(
   include
