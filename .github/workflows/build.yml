@@ -19,7 +19,7 @@ jobs:
       run: |
         docker compose run devcontainer bash -c "colcon build --symlink-install"
       
-    - name: Test roboguard
+    - name: Test ovis_ros2
       run: |
         docker compose run devcontainer bash -c "colcon test --packages-ignore micro_ros_setup"
 
