@@ -15,7 +15,7 @@ jobs:
     - name: Build docker compose
       run: |
         docker compose build --build-arg USER_UID=$(id -u) --build-arg USER_GID=$(id -g)
-    - name: Build roboguard
+    - name: Build ovis_ros2
       run: |
         docker compose run devcontainer bash -c "colcon build --symlink-install"
       
