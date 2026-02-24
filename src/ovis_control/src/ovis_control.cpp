@@ -89,11 +89,11 @@ TEMPLATES__ROS2_CONTROL__VISIBILITY_PUBLIC std::vector<hardware_interface::State
                 info_.joints[i].name, hardware_interface::HW_IF_VELOCITY, &hw_velocity_states_[i]));
         }
 
-        // for (size_t i = 0; i < info_.joints.size(); ++i)
-        // {
-        //     state_interfaces.emplace_back(hardware_interface::StateInterface(
-        //         info_.joints[i].name, hardware_interface::HW_IF_EFFORT, &hw_effort_states_[i]));
-        // }
+        for (size_t i = 0; i < info_.joints.size(); ++i)
+        {
+            state_interfaces.emplace_back(hardware_interface::StateInterface(
+                info_.joints[i].name, hardware_interface::HW_IF_EFFORT, &hw_effort_states_[i]));
+        }
 
         // for (size_t i = 0; i < info_.joints.size(); ++i)
         // {
@@ -114,17 +114,17 @@ TEMPLATES__ROS2_CONTROL__VISIBILITY_PUBLIC std::vector<hardware_interface::State
                 info_.joints[i].name, hardware_interface::HW_IF_POSITION, &hw_position_commands_[i]));
         }
 
-        // for (size_t i = 0; i < info_.joints.size(); ++i)
-        // {
-        //     command_interfaces.emplace_back(hardware_interface::CommandInterface(
-        //         info_.joints[i].name, hardware_interface::HW_IF_VELOCITY, &hw_velocity_commands_[i]));
-        // }
+        for (size_t i = 0; i < info_.joints.size(); ++i)
+        {
+            command_interfaces.emplace_back(hardware_interface::CommandInterface(
+                info_.joints[i].name, hardware_interface::HW_IF_VELOCITY, &hw_velocity_commands_[i]));
+        }
 
-        // for (size_t i = 0; i < info_.joints.size(); ++i)
-        // {
-        //     command_interfaces.emplace_back(hardware_interface::CommandInterface(
-        //         info_.joints[i].name, hardware_interface::HW_IF_EFFORT, &hw_effort_states_[i]));
-        // }
+        for (size_t i = 0; i < info_.joints.size(); ++i)
+        {
+            command_interfaces.emplace_back(hardware_interface::CommandInterface(
+                info_.joints[i].name, hardware_interface::HW_IF_EFFORT, &hw_effort_states_[i]));
+        }
 
         // for (size_t i = 0; i < info_.joints.size(); ++i)
         // {

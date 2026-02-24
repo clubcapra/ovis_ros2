@@ -20,12 +20,14 @@
 
 
     <xacro:property name="J_PI" value="3.1415926535897931" />
+    <xacro:property name="large_max_vel" value="${36*J_PI/180}" />
+    <xacro:property name="small_max_vel" value="${48*J_PI/180}" />
 
     <xacro:macro name="kinova_armlink" params="link_name link_mesh ring_mesh:=ring_big use_ring_mesh:=false mesh_no">
         <link name="${link_name}">
             <visual name="${link_name}_vis">
                 <geometry>
-                    <mesh filename="file://$(find ovis_description)/urdf/ovis2/meshes/visual/${link_mesh}.stl"/>
+                    <mesh filename="file://$(find ovis_description)/meshes/visual/${link_mesh}.stl"/>
                 </geometry>
                 <material name="carbon_fiber">
                     <color rgba="0.792156862745098 0 0 1" />
@@ -33,7 +35,7 @@
             </visual>
             <collision name="${link_name}_col">
                 <geometry>
-                    <mesh filename="file://$(find ovis_description)/urdf/ovis2/meshes/collision/${link_mesh}.stl"/>
+                    <mesh filename="file://$(find ovis_description)/meshes/collision/${link_mesh}.stl"/>
                 </geometry>
             </collision>
             <inertial>

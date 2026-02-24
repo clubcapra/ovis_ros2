@@ -71,8 +71,9 @@ KinovaComm::KinovaComm(boost::recursive_mutex& api_mutex,
 
     //Set ethernet parameters
     EthernetCommConfig ethernet_settings;
-    std::string local_IP,subnet_mask;
-    int local_cmd_port,local_bcast_port;
+    std::string local_IP,subnet_mask = "255.255.255.0";
+    int local_cmd_port = 25015,local_bcast_port = 25025;
+    
     if (info.hardware_parameters.find("local_machine_IP") != info.hardware_parameters.end())
         local_IP = info.hardware_parameters.at("local_machine_IP");
     if (info.hardware_parameters.find("subnet_mask") != info.hardware_parameters.end())
