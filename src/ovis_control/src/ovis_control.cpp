@@ -185,9 +185,9 @@ TEMPLATES__ROS2_CONTROL__VISIBILITY_PUBLIC std::vector<hardware_interface::State
         kinova::KinovaAngles angles;
         try
         {
-            RCLCPP_INFO_THROTTLE(rclcpp::get_logger(get_name()), clk, 1000, "Getting angles");
+            // RCLCPP_INFO_THROTTLE(rclcpp::get_logger(get_name()), clk, 1000, "Getting angles");
             comm->getJointAngles(angles);
-            RCLCPP_INFO_STREAM_THROTTLE(rclcpp::get_logger(get_name()), clk, 1000, "Angles at" << "\n1:" << angles.Actuator1 << "\n2:" << angles.Actuator2 << "\n3:" << angles.Actuator3 << "\n4:" << angles.Actuator4 << "\n5:" << angles.Actuator5 << "\n6:" << angles.Actuator6);
+            // RCLCPP_INFO_STREAM_THROTTLE(rclcpp::get_logger(get_name()), clk, 1000, "Angles at" << "\n1:" << angles.Actuator1 << "\n2:" << angles.Actuator2 << "\n3:" << angles.Actuator3 << "\n4:" << angles.Actuator4 << "\n5:" << angles.Actuator5 << "\n6:" << angles.Actuator6);
 
             for (size_t i = 0; i < info_.joints.size(); ++i)
             {
@@ -195,18 +195,18 @@ TEMPLATES__ROS2_CONTROL__VISIBILITY_PUBLIC std::vector<hardware_interface::State
                 hw_position_states_.at(i) = deg2rad((double)angles[i] - hw_position_init_.at(i)) * hw_position_invert_.at(i);
                 // hw_position_states_.at(i) = -deg2rad((double)angles[i]);
             }
-            RCLCPP_INFO_STREAM_THROTTLE(rclcpp::get_logger(get_name()), clk, 1000, "Offset angles at" << "\n1:" << hw_position_states_[0] << "\n2:" << hw_position_states_[1] << "\n3:" << hw_position_states_[2] << "\n4:" << hw_position_states_[3] << "\n5:" << hw_position_states_[4] << "\n6:" << hw_position_states_[5]);
+            // RCLCPP_INFO_STREAM_THROTTLE(rclcpp::get_logger(get_name()), clk, 1000, "Offset angles at" << "\n1:" << hw_position_states_[0] << "\n2:" << hw_position_states_[1] << "\n3:" << hw_position_states_[2] << "\n4:" << hw_position_states_[3] << "\n5:" << hw_position_states_[4] << "\n6:" << hw_position_states_[5]);
             comm->getJointVelocities(angles);
             for (size_t i = 0; i < info_.joints.size(); ++i)
             {
                 hw_velocity_states_.at(i) = deg2rad((double)angles[i]) * hw_position_invert_.at(i);
             }
 
-            // comm->getJointTorques(angles);
-            // for (size_t i = 0; i < info_.joints.size(); ++i)
-            // {
-            //     hw_effort_states_.at(i) = (double)angles[i];
-            // }
+            comm->getJointTorques(angles);
+            for (size_t i = 0; i < info_.joints.size(); ++i)
+            {
+                hw_effort_states_.at(i) = (double)angles[i];
+            }
         }
         catch (const kinova::KinovaCommException &e)
         {
@@ -230,12 +230,13 @@ TEMPLATES__ROS2_CONTROL__VISIBILITY_PUBLIC std::vector<hardware_interface::State
                 switch (control_level_)
                 {
                 case POSITION:
-                        RCLCPP_INFO_STREAM_THROTTLE(rclcpp::get_logger(get_name()), clk, 1000, "Offset angles to" << "\n1:" << hw_position_states_[0] << "\n2:" << hw_position_states_[1] << "\n3:" << hw_position_states_[2] << "\n4:" << hw_position_states_[3] << "\n5:" << hw_position_states_[4] << "\n6:" << hw_position_states_[5]);
+                        // RCLCPP_INFO_STREAM_THROTTLE(rclcpp::get_logger(get_name()), clk, 1000, "Offset angles to" << "\n1:" << hw_position_states_[0] << "\n2:" << hw_position_states_[1] << "\n3:" << hw_position_states_[2] << "\n4:" << hw_position_states_[3] << "\n5:" << hw_position_states_[4] << "\n6:" << hw_position_states_[5]);
                         angles[i] = (float)(rad2deg(hw_position_commands_.at(i)) * hw_position_invert_.at(i) + hw_position_init_.at(i));
                         // angles[i] = -(float)(rad2deg(hw_position_commands_.at(i)));
-                        RCLCPP_INFO_STREAM_THROTTLE(rclcpp::get_logger(get_name()), clk, 1000, "Angles to" << "\n1:" << angles.Actuator1 << "\n2:" << angles.Actuator2 << "\n3:" << angles.Actuator3 << "\n4:" << angles.Actuator4 << "\n5:" << angles.Actuator5 << "\n6:" << angles.Actuator6);
+                        // RCLCPP_INFO_STREAM_THROTTLE(rclcpp::get_logger(get_name()), clk, 1000, "Angles to" << "\n1:" << angles.Actuator1 << "\n2:" << angles.Actuator2 << "\n3:" << angles.Actuator3 << "\n4:" << angles.Actuator4 << "\n5:" << angles.Actuator5 << "\n6:" << angles.Actuator6);
                     break;
                 case VELOCITY:
+                        // RCLCPP_INFO_STREAM_THROTTLE(rclcpp::get_logger(get_name()), clk, 1000, "Set speed angles to" << "\n1:" << hw_velocity_commands_[0] << "\n2:" << hw_velocity_commands_[1] << "\n3:" << hw_velocity_commands_[2] << "\n4:" << hw_velocity_commands_[3] << "\n5:" << hw_velocity_commands_[4] << "\n6:" << hw_velocity_commands_[5]);
                         angles[i] = (float)rad2deg(hw_velocity_commands_.at(i) * hw_position_invert_.at(i));
                     break;
                 default:
@@ -249,7 +250,7 @@ TEMPLATES__ROS2_CONTROL__VISIBILITY_PUBLIC std::vector<hardware_interface::State
                     comm->setJointAngles(angles);
                 break;
             case VELOCITY:
-                    // comm->setJointVelocities(angles);
+                    comm->setJointVelocities(angles);
                 break;
             default:
                 RCLCPP_ERROR(logger(), "Invalid control level");
@@ -270,6 +271,7 @@ TEMPLATES__ROS2_CONTROL__VISIBILITY_PUBLIC std::vector<hardware_interface::State
         const std::vector<std::string> &start_interfaces,
         const std::vector<std::string> &stop_interfaces)
     {
+        control_level_ = integration_level_t::VELOCITY;
         // Prepare for new command modes
         // std::vector<integration_level_t> new_modes = {};
         // for (std::string key : start_interfaces)

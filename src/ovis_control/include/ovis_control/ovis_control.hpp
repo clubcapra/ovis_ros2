@@ -97,7 +97,7 @@ private:
   volatile bool isActive = false;
 
 
-  integration_level_t control_level_ = integration_level_t::POSITION;
+  integration_level_t control_level_ = integration_level_t::VELOCITY;
 
   const rclcpp::Logger logger() const;
 };
