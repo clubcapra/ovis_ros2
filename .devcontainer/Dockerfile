@@ -8,7 +8,6 @@ ARG USER_GID=$USER_UID
 
 # ENV variables
 ENV ROS_DISTRO=humble
-ENV GZ_VERSION=harmonic
 
 WORKDIR /workspace/$USERNAME
 
@@ -16,7 +15,6 @@ RUN groupadd --gid $USER_GID $USERNAME || true \
     && groupadd -g 107 input \
     && useradd -s /bin/bash --uid $USER_UID -g $USER_GID -G 107 -m $USERNAME \
     && apt-get update \
-    && apt-get install -y sudo tesseract-ocr \
     && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
     && chmod 0440 /etc/sudoers.d/$USERNAME
 
@@ -37,33 +35,18 @@ RUN apt-get update && apt-get install -y \
     gnupg \
     curl
 
-# Add Gazebo Harmonic repository
-RUN wget https://packages.osrfoundation.org/gazebo.gpg -O /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg
-RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/gazebo-stable.list > /dev/null
-
-RUN apt update -y 
-
 # Change user
 RUN chown $USER_UID:$USER_GID /workspace/$USERNAME
 USER $USERNAME
-
-# Copy to preload the ros packages
-COPY ./ /workspace/$USERNAME/
 
 # Source the ROS setup file
 RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> ~/.bashrc
 
 COPY --chown=$USERNAME ./ /workspace/$USERNAME
 
-# Add needed packages
-RUN vcs import src < ovis.repos
-
+RUN cd /workspace/$USERNAME
 
 # Rosdep update
-RUN rosdep update
-
-# Install ROS dependencies
-RUN rosdep install --from-paths src --ignore-src --rosdistro humble -y --skip-keys=gz-plugin2 --skip-keys=gz-sim8
-
-# Install gzharmonic after rosdep install
-RUN sudo apt install -y ros-humble-ros-gzharmonic
+RUN bash -c "source /opt/ros/humble/setup.bash && \
+    rosdep update && \
+    rosdep install --from-paths src --ignore-src -r -y"

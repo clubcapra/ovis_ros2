@@ -1,6 +1,6 @@
 name: ROS2 ovis build
 run-name: ${{ github.actor }} is working on ROS2 ovis build
-on: [push]
+on: [pull_request]
 jobs:
   Build_ovis:
     runs-on: ubuntu-latest
@@ -14,5 +14,12 @@ jobs:
 
     - name: Build docker compose
       run: |
-        docker compose run --user root devcontainer bash -c "colcon build"
+        docker compose build --build-arg USER_UID=$(id -u) --build-arg USER_GID=$(id -g)
+    - name: Build roboguard
+      run: |
+        docker compose run devcontainer bash -c "colcon build --symlink-install"
+      
+    - name: Test roboguard
+      run: |
+        docker compose run devcontainer bash -c "colcon test --packages-ignore micro_ros_setup"
 

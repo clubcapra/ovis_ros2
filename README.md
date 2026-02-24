@@ -37,3 +37,10 @@ Launch Joystick control with Moveit! and Servo :
 ```bash
 ros2 launch ovis_bringup combined.launch.py
 ```
+
+## Contributing
+
+Before pushing your code, you should try to deploy it by using:
+```bash
+docker compose build --build-arg USER_UID=$(id -u) --build-arg USER_GID=$(id -g) --build-arg USERNAME=$(id -un)
+```
