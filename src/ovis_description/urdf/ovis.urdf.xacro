@@ -1,14 +1,16 @@
 <?xml version="1.0"?>
 <root xmlns:xacro="http://www.ros.org/wiki/xacro">
 
+    <xacro:include filename="$(find ovis_description)/urdf/ovis.common.urdf.xacro" />
+    <xacro:include filename="$(find ovis_description)/urdf/ovis.ros2_control.urdf.xacro" />
 
-    <xacro:property name="link_base_mesh" value="visual/ovis_base" />
-    <xacro:property name="link_1_mesh" value="visual/ovis_shoulder" />
-    <xacro:property name="link_2_mesh" value="visual/ovis_upper_arm" />
-    <xacro:property name="link_3_mesh" value="visual/ovis_elbow" />
-    <xacro:property name="link_4_mesh" value="visual/ovis_forearm" />
-    <xacro:property name="link_5_mesh" value="visual/ovis_wrist" />
-    <xacro:property name="link_6_mesh" value="visual/ovis_flange" />
+    <xacro:property name="link_base_mesh" value="ovis_base" />
+    <xacro:property name="link_1_mesh" value="ovis_j12" />
+    <xacro:property name="link_2_mesh" value="ovis_j23" />
+    <xacro:property name="link_3_mesh" value="ovis_j34" />
+    <xacro:property name="link_4_mesh" value="ovis_j45" />
+    <xacro:property name="link_5_mesh" value="ovis_j56" />
+    <xacro:property name="link_6_mesh" value="ovis_end_effector" />
 
     <xacro:property name="link_base_mesh_no" value="0" />
     <xacro:property name="link_1_mesh_no" value="1" />
@@ -18,144 +20,147 @@
     <xacro:property name="link_5_mesh_no" value="4" />
     <xacro:property name="link_6_mesh_no" value="55" />
 
-    <xacro:property name="joint_base" value="joint_base" />
+    <xacro:property name="joint_base_name" value="base" />
     <xacro:property name="joint_base_type" value="fixed" />
     <xacro:property name="joint_base_axis_xyz" value="0 0 0" />
     <!-- Transferred to a parameter in the ovis macro -->
     <!-- <xacro:property name="joint_base_origin_xyz" value="0 0 0" /> -->
-    <xacro:property name="joint_base_origin_rpy" value="${J_PI/2} 0 0" />
+    <xacro:property name="joint_base_origin_rpy" value="0 0 0" />
 
 
-    <xacro:property name="joint_1" value="joint_1" />
+    <xacro:property name="joint_1_name" value="1" />
     <xacro:property name="joint_1_type" value="continuous" />
-    <xacro:property name="joint_1_axis_xyz" value="0 1 0" />
-    <xacro:property name="joint_1_origin_xyz" value="0 0.051 0" />
+    <xacro:property name="joint_1_axis_xyz" value="0 0 1" />
+    <xacro:property name="joint_1_origin_xyz" value="0 0 0.03" />
     <xacro:property name="joint_1_origin_rpy" value="0 0 0" />
-    <xacro:property name="joint_1_lower_limit" value="${-4*J_PI}" />
-    <xacro:property name="joint_1_upper_limit" value="${4*J_PI}" />
-    <xacro:property name="joint_1_velocity_limit" value="${36*J_PI/180}" />
+    <xacro:property name="joint_1_lower_limit" value="0" />
+    <xacro:property name="joint_1_upper_limit" value="0" />
+    <xacro:property name="joint_1_velocity_limit" value="${large_max_vel}" />
     <xacro:property name="joint_1_torque_limit" value="40" />
 
-    <xacro:property name="joint_2" value="joint_2" />
+    <xacro:property name="joint_2_name" value="2" />
     <xacro:property name="joint_2_type" value="revolute" />
-    <xacro:property name="joint_2_axis_xyz" value="0 0 1" />
-    <xacro:property name="joint_2_origin_xyz" value="0 0.0889 0" />
-    <xacro:property name="joint_2_origin_rpy" value="0 0 ${-J_PI/2}" />
-    <xacro:property name="joint_2_lower_limit" value="0" />
-    <xacro:property name="joint_2_upper_limit" value="${J_PI}" />
-    <xacro:property name="joint_2_velocity_limit" value="${36*J_PI/180}" />
+    <xacro:property name="joint_2_axis_xyz" value="0 1 0" />
+    <xacro:property name="joint_2_origin_xyz" value="0.00004 0.0625 0.07001" />
+    <xacro:property name="joint_2_origin_rpy" value="0 0 0" />
+    <xacro:property name="joint_2_lower_limit" value="${-195*J_PI/180}" />
+    <xacro:property name="joint_2_upper_limit" value="${15*J_PI/180}" />
+    <xacro:property name="joint_2_velocity_limit" value="${large_max_vel}" />
     <xacro:property name="joint_2_torque_limit" value="80" />
 
-    <xacro:property name="joint_3" value="joint_3" />
+    <xacro:property name="joint_3_name" value="3" />
     <xacro:property name="joint_3_type" value="revolute" />
-    <xacro:property name="joint_3_axis_xyz" value="0 0 1" />
-    <xacro:property name="joint_3_origin_xyz" value="0 0.465 0" />
-    <xacro:property name="joint_3_origin_rpy" value="0 0 ${J_PI}" />
-    <xacro:property name="joint_3_lower_limit" value="${-J_PI}" />
+    <xacro:property name="joint_3_axis_xyz" value="0 -1 0" />
+    <xacro:property name="joint_3_origin_xyz" value="0.30039 -0.01763 0.00072" />
+    <xacro:property name="joint_3_origin_rpy" value="0 0 0" />
+    <xacro:property name="joint_3_lower_limit" value="${-300*J_PI/180}" />
     <xacro:property name="joint_3_upper_limit" value="0" />
-    <xacro:property name="joint_3_velocity_limit" value="${36*J_PI/180}" />
+    <xacro:property name="joint_3_velocity_limit" value="${large_max_vel}" />
     <xacro:property name="joint_3_torque_limit" value="40" />
 
-    <xacro:property name="joint_4" value="joint_4" />
+    <xacro:property name="joint_4_name" value="4" />
     <xacro:property name="joint_4_type" value="continuous" />
-    <xacro:property name="joint_4_axis_xyz" value="0 1 0" />
-    <xacro:property name="joint_4_origin_xyz" value="0.0889 0.047625 0" />
+    <xacro:property name="joint_4_axis_xyz" value="-1 0 0" />
+    <xacro:property name="joint_4_origin_xyz" value="-0.06672 -0.04897 -0.00044" />
     <xacro:property name="joint_4_origin_rpy" value="0 0 0" />
-    <xacro:property name="joint_4_lower_limit" value="${-4*J_PI}" />
-    <xacro:property name="joint_4_upper_limit" value="${4*J_PI}" />
-    <xacro:property name="joint_4_velocity_limit" value="${48*J_PI/180}" />
+    <xacro:property name="joint_4_lower_limit" value="0" />
+    <xacro:property name="joint_4_upper_limit" value="0" />
+    <xacro:property name="joint_4_velocity_limit" value="${small_max_vel}" />
     <xacro:property name="joint_4_torque_limit" value="20" />
 
-    <xacro:property name="joint_5" value="joint_5" />
+    <xacro:property name="joint_5_name" value="5" />
     <xacro:property name="joint_5_type" value="revolute" />
-    <xacro:property name="joint_5_axis_xyz" value="0 0 1" />
-    <xacro:property name="joint_5_origin_xyz" value="0 0.265 0" />
+    <xacro:property name="joint_5_axis_xyz" value="0 1 0" />
+    <xacro:property name="joint_5_origin_xyz" value="-0.33480 0.00015 0.00051" />
     <xacro:property name="joint_5_origin_rpy" value="0 0 0" />
-    <xacro:property name="joint_5_lower_limit" value="${-J_PI/2}" />
-    <xacro:property name="joint_5_upper_limit" value="${J_PI/2}" />
-    <xacro:property name="joint_5_velocity_limit" value="${48*J_PI/180}" />
+    <xacro:property name="joint_5_lower_limit" value="${-95*J_PI/180}" />
+    <xacro:property name="joint_5_upper_limit" value="${95*J_PI/180}" />
+    <xacro:property name="joint_5_velocity_limit" value="${small_max_vel}" />
     <xacro:property name="joint_5_torque_limit" value="20" />
 
-    <xacro:property name="joint_6" value="joint_6" />
+    <xacro:property name="joint_6_name" value="6" />
     <xacro:property name="joint_6_type" value="continuous" />
-    <xacro:property name="joint_6_axis_xyz" value="0 0 1" />
-    <xacro:property name="joint_6_origin_xyz" value="0 0.0762 0" />
-    <xacro:property name="joint_6_origin_rpy" value="${J_PI/2} ${J_PI/2} 0" />
+    <xacro:property name="joint_6_axis_xyz" value="-1 0 0" />
+    <xacro:property name="joint_6_origin_xyz" value="-0.07 0.00003 0.00001" />
+    <xacro:property name="joint_6_origin_rpy" value="0 0 0" />
     <!-- If gripper inverted, use this line instead -->
     <!-- <xacro:property name="joint_6_origin_rpy" value="$${-J_PI/3} 0 0" /> -->
     <xacro:property name="joint_6_lower_limit" value="${-2*J_PI}" />
     <xacro:property name="joint_6_upper_limit" value="${2*J_PI}" />
-    <xacro:property name="joint_6_velocity_limit" value="${48*J_PI/180}" />
+    <xacro:property name="joint_6_velocity_limit" value="${small_max_vel}" />
     <xacro:property name="joint_6_torque_limit" value="20" />
 
+
+    <xacro:property name="joint_end_effector_name" value="end_effector" />
     <xacro:property name="joint_end_effector" value="end_effector_offset" />
     <xacro:property name="joint_end_effector_type" value="fixed" />
     <xacro:property name="joint_end_effector_axis_xyz" value="0 0 0" />
-    <xacro:property name="joint_end_effector_origin_xyz" value="0 0 -0.1600" />
+    <xacro:property name="joint_end_effector_origin_xyz" value="-0.25 0 0" />
     <xacro:property name="joint_end_effector_origin_rpy" value="${J_PI} 0 ${J_PI/2}" />
 
 
-    <xacro:macro name="ovis" params="base_parent type:=ovis prefix:=ovis joint_base_origin_xyz:='0 0 0'">
+    <xacro:macro name="ovis" params="base_parent prefix:=ovis joint_base_origin_xyz:='0 0 0' use_mock:=false">
 
 
-        <xacro:kinova_armlink link_name="${prefix}_link_base" link_mesh="${link_base_mesh}"
+        <xacro:kinova_armlink link_name="${prefix}_link_${joint_base_name}" link_mesh="${link_base_mesh}"
             mesh_no="${link_base_mesh_no}" />
-        <xacro:kinova_armjoint joint_name="${prefix}_joint_base" type="${joint_base_type}"
-            parent="${base_parent}" child="${prefix}_link_base"
+        <xacro:kinova_armjoint joint_name="${prefix}_joint_${joint_base_name}" type="${joint_base_type}"
+            parent="${base_parent}" child="${prefix}_link_${joint_base_name}"
             joint_axis_xyz="${joint_base_axis_xyz}" joint_origin_xyz="${joint_base_origin_xyz}"
-            joint_origin_rpy="${joint_base_origin_rpy}" joint_lower_limit="0" joint_upper_limit="0"
+            joint_origin_rpy="${joint_base_origin_rpy}" 
+            joint_lower_limit="0" joint_upper_limit="0"
             joint_velocity_limit="0" joint_torque_limit="0" fixed="true" />
 
-        <xacro:kinova_armlink link_name="${prefix}_link_1" link_mesh="${link_1_mesh}"
+        <xacro:kinova_armlink link_name="${prefix}_link_${joint_1_name}" link_mesh="${link_1_mesh}"
             use_ring_mesh="false" mesh_no="${link_1_mesh_no}" />
-        <xacro:kinova_armjoint joint_name="${prefix}_joint_1" type="${joint_1_type}"
-            parent="${prefix}_link_base" child="${prefix}_link_1"
+        <xacro:kinova_armjoint joint_name="${prefix}_joint_${joint_1_name}" type="${joint_1_type}"
+            parent="${prefix}_link_${joint_base_name}" child="${prefix}_link_${joint_1_name}"
             joint_axis_xyz="${joint_1_axis_xyz}" joint_origin_xyz="${joint_1_origin_xyz}"
             joint_origin_rpy="${joint_1_origin_rpy}" joint_lower_limit="${joint_1_lower_limit}"
             joint_upper_limit="${joint_1_upper_limit}"
             joint_velocity_limit="${joint_1_velocity_limit}"
             joint_torque_limit="${joint_1_torque_limit}" />
 
-        <xacro:kinova_armlink link_name="${prefix}_link_2" link_mesh="${link_2_mesh}"
+        <xacro:kinova_armlink link_name="${prefix}_link_${joint_2_name}" link_mesh="${link_2_mesh}"
             use_ring_mesh="false" mesh_no="${link_2_mesh_no}" />
-        <xacro:kinova_armjoint joint_name="${prefix}_joint_2" type="${joint_2_type}"
-            parent="${prefix}_link_1" child="${prefix}_link_2" joint_axis_xyz="${joint_2_axis_xyz}"
+        <xacro:kinova_armjoint joint_name="${prefix}_joint_${joint_2_name}" type="${joint_2_type}"
+            parent="${prefix}_link_${joint_1_name}" child="${prefix}_link_${joint_2_name}" joint_axis_xyz="${joint_2_axis_xyz}"
             joint_origin_xyz="${joint_2_origin_xyz}" joint_origin_rpy="${joint_2_origin_rpy}"
             joint_lower_limit="${joint_2_lower_limit}" joint_upper_limit="${joint_2_upper_limit}"
             joint_velocity_limit="${joint_2_velocity_limit}"
             joint_torque_limit="${joint_2_torque_limit}" />
 
-        <xacro:kinova_armlink link_name="${prefix}_link_3" link_mesh="${link_3_mesh}"
+        <xacro:kinova_armlink link_name="${prefix}_link_${joint_3_name}" link_mesh="${link_3_mesh}"
             use_ring_mesh="false" mesh_no="${link_3_mesh_no}" />
-        <xacro:kinova_armjoint joint_name="${prefix}_joint_3" type="${joint_3_type}"
-            parent="${prefix}_link_2" child="${prefix}_link_3" joint_axis_xyz="${joint_3_axis_xyz}"
+        <xacro:kinova_armjoint joint_name="${prefix}_joint_${joint_3_name}" type="${joint_3_type}"
+            parent="${prefix}_link_${joint_2_name}" child="${prefix}_link_${joint_3_name}" joint_axis_xyz="${joint_3_axis_xyz}"
             joint_origin_xyz="${joint_3_origin_xyz}" joint_origin_rpy="${joint_3_origin_rpy}"
             joint_lower_limit="${joint_3_lower_limit}" joint_upper_limit="${joint_3_upper_limit}"
             joint_velocity_limit="${joint_3_velocity_limit}"
             joint_torque_limit="${joint_3_torque_limit}" />
 
-        <xacro:kinova_armlink link_name="${prefix}_link_4" link_mesh="${link_4_mesh}"
+        <xacro:kinova_armlink link_name="${prefix}_link_${joint_4_name}" link_mesh="${link_4_mesh}"
             use_ring_mesh="false" ring_mesh="ring_small" mesh_no="${link_4_mesh_no}" />
-        <xacro:kinova_armjoint joint_name="${prefix}_joint_4" type="${joint_4_type}"
-            parent="${prefix}_link_3" child="${prefix}_link_4" joint_axis_xyz="${joint_4_axis_xyz}"
+        <xacro:kinova_armjoint joint_name="${prefix}_joint_${joint_4_name}" type="${joint_4_type}"
+            parent="${prefix}_link_${joint_3_name}" child="${prefix}_link_${joint_4_name}" joint_axis_xyz="${joint_4_axis_xyz}"
             joint_origin_xyz="${joint_4_origin_xyz}" joint_origin_rpy="${joint_4_origin_rpy}"
             joint_lower_limit="${joint_4_lower_limit}" joint_upper_limit="${joint_4_upper_limit}"
             joint_velocity_limit="${joint_4_velocity_limit}"
             joint_torque_limit="${joint_4_torque_limit}" />
 
-        <xacro:kinova_armlink link_name="${prefix}_link_5" link_mesh="${link_5_mesh}"
+        <xacro:kinova_armlink link_name="${prefix}_link_${joint_5_name}" link_mesh="${link_5_mesh}"
             use_ring_mesh="false" ring_mesh="ring_small" mesh_no="${link_5_mesh_no}" />
-        <xacro:kinova_armjoint joint_name="${prefix}_joint_5" type="${joint_5_type}"
-            parent="${prefix}_link_4" child="${prefix}_link_5" joint_axis_xyz="${joint_5_axis_xyz}"
+        <xacro:kinova_armjoint joint_name="${prefix}_joint_${joint_5_name}" type="${joint_5_type}"
+            parent="${prefix}_link_${joint_4_name}" child="${prefix}_link_${joint_5_name}" joint_axis_xyz="${joint_5_axis_xyz}"
             joint_origin_xyz="${joint_5_origin_xyz}" joint_origin_rpy="${joint_5_origin_rpy}"
             joint_lower_limit="${joint_5_lower_limit}" joint_upper_limit="${joint_5_upper_limit}"
             joint_velocity_limit="${joint_5_velocity_limit}"
             joint_torque_limit="${joint_5_torque_limit}" />
 
-        <xacro:kinova_armlink link_name="${prefix}_link_6" link_mesh="${link_6_mesh}"
+        <xacro:kinova_armlink link_name="${prefix}_link_${joint_6_name}" link_mesh="${link_6_mesh}"
             use_ring_mesh="false" ring_mesh="ring_small" mesh_no="${link_6_mesh_no}" />
-        <xacro:kinova_armjoint joint_name="${prefix}_joint_6" type="${joint_6_type}"
-            parent="${prefix}_link_5" child="${prefix}_link_6" joint_axis_xyz="${joint_6_axis_xyz}"
+        <xacro:kinova_armjoint joint_name="${prefix}_joint_${joint_6_name}" type="${joint_6_type}"
+            parent="${prefix}_link_${joint_5_name}" child="${prefix}_link_${joint_6_name}" joint_axis_xyz="${joint_6_axis_xyz}"
             joint_origin_xyz="${joint_6_origin_xyz}" joint_origin_rpy="${joint_6_origin_rpy}"
             joint_lower_limit="${joint_6_lower_limit}" joint_upper_limit="${joint_6_upper_limit}"
             joint_velocity_limit="${joint_6_velocity_limit}"
@@ -164,11 +169,13 @@
 
         <xacro:kinova_virtual_link link_name="${prefix}_end_effector" />
         <xacro:kinova_virtual_joint joint_name="${prefix}_joint_end_effector"
-            type="${joint_end_effector_type}" parent="${prefix}_link_6"
+            type="${joint_end_effector_type}" parent="${prefix}_link_${joint_6_name}"
             child="${prefix}_end_effector" joint_axis_xyz="${joint_end_effector_axis_xyz}"
             joint_origin_xyz="${joint_end_effector_origin_xyz}"
             joint_origin_rpy="${joint_end_effector_origin_rpy}" joint_lower_limit="0"
             joint_upper_limit="0" />
+
+        <xacro:ovis_control prefix="${prefix}" use_mock="${use_mock}" />
 
     </xacro:macro>
 
