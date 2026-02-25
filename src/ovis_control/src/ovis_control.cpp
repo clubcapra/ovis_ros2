@@ -214,7 +214,7 @@ TEMPLATES__ROS2_CONTROL__VISIBILITY_PUBLIC std::vector<hardware_interface::State
                     comm->setJointAngles(angles);
                     break;
                 case VELOCITY:
-                    RCLCPP_INFO_STREAM_THROTTLE(rclcpp::get_logger(get_name()), clk, 1000, "Set speed angles to" << "\n1:" << angles[0] << "\n2:" << angles[1] << "\n3:" << angles[2] << "\n4:" << angles[3] << "\n5:" << angles[4] << "\n6:" << angles[5]);
+                    // RCLCPP_INFO_STREAM_THROTTLE(rclcpp::get_logger(get_name()), clk, 1000, "Set speed angles to" << "\n1:" << angles[0] << "\n2:" << angles[1] << "\n3:" << angles[2] << "\n4:" << angles[3] << "\n5:" << angles[4] << "\n6:" << angles[5]);
                     comm->setJointVelocities(angles);
                     break;
                 default:
