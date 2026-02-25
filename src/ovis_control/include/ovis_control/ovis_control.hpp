@@ -88,16 +88,13 @@ private:
   std::vector<double> hw_position_invert_{-1, -1, -1, -1, -1, -1};
   std::vector<double> hw_velocity_commands_;
   std::vector<double> hw_velocity_states_;
-  std::vector<double> hw_effort_commands_;
   std::vector<double> hw_effort_states_;
-  // std::vector<double> hw_accel_commands_;
-  // std::vector<double> hw_accel_states_;
   kinova::KinovaComm* comm = nullptr;
   boost::recursive_mutex mApiMutex{};
   volatile bool isActive = false;
 
 
-  integration_level_t control_level_ = integration_level_t::VELOCITY;
+  integration_level_t control_level_ = integration_level_t::UNDEFINED;
 
   const rclcpp::Logger logger() const;
 };

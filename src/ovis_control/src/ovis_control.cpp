@@ -25,12 +25,12 @@ using namespace std::chrono;
 namespace ovis_control
 {
 
-    double rad2deg(double rad)
+    double rad2deg(const double& rad)
     {
-        return rad / (M_PI / 180);
+        return rad * 180 / M_PI;
     }
 
-    double deg2rad(double deg)
+    double deg2rad(const double& deg)
     {
         return deg * (M_PI / 180);
     }
@@ -45,24 +45,10 @@ namespace ovis_control
         }
         hw_position_commands_.resize(info_.joints.size(), 0);
         hw_position_states_.resize(info_.joints.size(), 0);
-        // hw_position_init_.resize(info_.joints.size(), 0);
         hw_velocity_commands_.resize(info_.joints.size(), 0);
         hw_velocity_states_.resize(info_.joints.size(), 0);
-        hw_effort_commands_.resize(info_.joints.size(), 0);
         hw_effort_states_.resize(info_.joints.size(), 0);
         
-        // hw_accel_commands_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
-        // hw_accel_states_.resize(info_.joints.size(), std::numeric_limits<double>::quiet_NaN());
-
-        // try
-        // {
-        //     comm = new kinova::KinovaComm(mApiMutex, info);
-        // }
-        // catch(const std::exception& e)
-        // {
-        //     return CallbackReturn::ERROR;
-        // }
-
         RCLCPP_INFO_ONCE(rclcpp::get_logger("ovis_control"), "Init success");
 
         return CallbackReturn::SUCCESS;
@@ -95,12 +81,6 @@ TEMPLATES__ROS2_CONTROL__VISIBILITY_PUBLIC std::vector<hardware_interface::State
                 info_.joints[i].name, hardware_interface::HW_IF_EFFORT, &hw_effort_states_[i]));
         }
 
-        // for (size_t i = 0; i < info_.joints.size(); ++i)
-        // {
-        //     state_interfaces.emplace_back(hardware_interface::StateInterface(
-        //         info_.joints[i].name, hardware_interface::HW_IF_ACCELERATION, &hw_accel_states_[i]));
-        // }
-
         return state_interfaces;
     }
 
@@ -119,18 +99,6 @@ TEMPLATES__ROS2_CONTROL__VISIBILITY_PUBLIC std::vector<hardware_interface::State
             command_interfaces.emplace_back(hardware_interface::CommandInterface(
                 info_.joints[i].name, hardware_interface::HW_IF_VELOCITY, &hw_velocity_commands_[i]));
         }
-
-        for (size_t i = 0; i < info_.joints.size(); ++i)
-        {
-            command_interfaces.emplace_back(hardware_interface::CommandInterface(
-                info_.joints[i].name, hardware_interface::HW_IF_EFFORT, &hw_effort_states_[i]));
-        }
-
-        // for (size_t i = 0; i < info_.joints.size(); ++i)
-        // {
-        //     command_interfaces.emplace_back(hardware_interface::CommandInterface(
-        //         info_.joints[i].name, hardware_interface::HW_IF_ACCELERATION, &hw_accel_states_[i]));
-        // }
 
         return command_interfaces;
     }
@@ -158,7 +126,6 @@ TEMPLATES__ROS2_CONTROL__VISIBILITY_PUBLIC std::vector<hardware_interface::State
         {
             hw_position_commands_.at(i) = deg2rad((double)angles[i] - hw_position_init_.at(i)) * hw_position_invert_.at(i);
         }
-        // hw_position_init_.resize(info_.joints.size(), 0);
         return CallbackReturn::SUCCESS;
     }
 
@@ -179,10 +146,10 @@ TEMPLATES__ROS2_CONTROL__VISIBILITY_PUBLIC std::vector<hardware_interface::State
         static rclcpp::Clock clk = rclcpp::Clock();
         if (!isActive)
         {
-            // RCLCPP_WARN_THROTTLE()
             return hardware_interface::return_type::OK;
         }
         kinova::KinovaAngles angles;
+        angles.InitStruct();
         try
         {
             // RCLCPP_INFO_THROTTLE(rclcpp::get_logger(get_name()), clk, 1000, "Getting angles");
@@ -230,33 +197,30 @@ TEMPLATES__ROS2_CONTROL__VISIBILITY_PUBLIC std::vector<hardware_interface::State
                 switch (control_level_)
                 {
                 case POSITION:
-                        // RCLCPP_INFO_STREAM_THROTTLE(rclcpp::get_logger(get_name()), clk, 1000, "Offset angles to" << "\n1:" << hw_position_states_[0] << "\n2:" << hw_position_states_[1] << "\n3:" << hw_position_states_[2] << "\n4:" << hw_position_states_[3] << "\n5:" << hw_position_states_[4] << "\n6:" << hw_position_states_[5]);
-                        angles[i] = (float)(rad2deg(hw_position_commands_.at(i)) * hw_position_invert_.at(i) + hw_position_init_.at(i));
-                        // angles[i] = -(float)(rad2deg(hw_position_commands_.at(i)));
-                        // RCLCPP_INFO_STREAM_THROTTLE(rclcpp::get_logger(get_name()), clk, 1000, "Angles to" << "\n1:" << angles.Actuator1 << "\n2:" << angles.Actuator2 << "\n3:" << angles.Actuator3 << "\n4:" << angles.Actuator4 << "\n5:" << angles.Actuator5 << "\n6:" << angles.Actuator6);
+                    // RCLCPP_INFO_STREAM_THROTTLE(rclcpp::get_logger(get_name()), clk, 1000, "Offset angles to" << "\n1:" << hw_position_states_[0] << "\n2:" << hw_position_states_[1] << "\n3:" << hw_position_states_[2] << "\n4:" << hw_position_states_[3] << "\n5:" << hw_position_states_[4] << "\n6:" << hw_position_states_[5]);
+                    angles[i] = (float)(rad2deg(hw_position_commands_.at(i)) * hw_position_invert_.at(i) + hw_position_init_.at(i));
+                    // RCLCPP_INFO_STREAM_THROTTLE(rclcpp::get_logger(get_name()), clk, 1000, "Angles to" << "\n1:" << angles.Actuator1 << "\n2:" << angles.Actuator2 << "\n3:" << angles.Actuator3 << "\n4:" << angles.Actuator4 << "\n5:" << angles.Actuator5 << "\n6:" << angles.Actuator6);
                     break;
                 case VELOCITY:
-                        // RCLCPP_INFO_STREAM_THROTTLE(rclcpp::get_logger(get_name()), clk, 1000, "Set speed angles to" << "\n1:" << hw_velocity_commands_[0] << "\n2:" << hw_velocity_commands_[1] << "\n3:" << hw_velocity_commands_[2] << "\n4:" << hw_velocity_commands_[3] << "\n5:" << hw_velocity_commands_[4] << "\n6:" << hw_velocity_commands_[5]);
-                        angles[i] = (float)rad2deg(hw_velocity_commands_.at(i) * hw_position_invert_.at(i));
+                    angles[i] = (float)rad2deg(hw_velocity_commands_.at(i) * hw_position_invert_.at(i));
                     break;
-                default:
-                    RCLCPP_ERROR(logger(), "Invalid control level");
-                    return hardware_interface::return_type::ERROR;
+                    default:
+                    break;
                 }
             }
             switch (control_level_)
             {
-            case POSITION:
+                case POSITION:
                     comm->setJointAngles(angles);
-                break;
-            case VELOCITY:
+                    break;
+                case VELOCITY:
+                    RCLCPP_INFO_STREAM_THROTTLE(rclcpp::get_logger(get_name()), clk, 1000, "Set speed angles to" << "\n1:" << angles[0] << "\n2:" << angles[1] << "\n3:" << angles[2] << "\n4:" << angles[3] << "\n5:" << angles[4] << "\n6:" << angles[5]);
                     comm->setJointVelocities(angles);
-                break;
-            default:
-                RCLCPP_ERROR(logger(), "Invalid control level");
-                return hardware_interface::return_type::ERROR;
+                    break;
+                default:
+                    RCLCPP_ERROR_THROTTLE(logger(), clk, 5000, "Invalid control level");
+                    break;
             }
-            // RCLCPP_INFO(logger(), "Angles set!");
         }
         catch (const kinova::KinovaCommException &e)
         {
@@ -307,10 +271,12 @@ TEMPLATES__ROS2_CONTROL__VISIBILITY_PUBLIC std::vector<hardware_interface::State
         if (key == info_.joints[0].name + "/" + hardware_interface::HW_IF_POSITION)
         {
             control_level_ = integration_level_t::POSITION;
+            RCLCPP_INFO(logger(), "Changed to Position control");
         }
         if (key == info_.joints[0].name + "/" + hardware_interface::HW_IF_VELOCITY)
         {
             control_level_ =  integration_level_t::VELOCITY;
+            RCLCPP_INFO(logger(), "Changed to Velocity control");
         }
         return hardware_interface::return_type::OK;
     }
