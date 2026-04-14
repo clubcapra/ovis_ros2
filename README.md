@@ -2,7 +2,6 @@
 
 Ovis is a 6 Degrees of Freedom (DoF) robotic arm developed by the CAPRA student club. It is designed to be highly versatile and is compatible with MoveIt for motion planning and Kinova motors for precise control. This repository provides the necessary tools and launch files to simulate and visualize the Ovis robotic arm using ROS2.
 
-
 ## Installation
 
 Clone and build the repository :
