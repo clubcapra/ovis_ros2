@@ -44,6 +44,7 @@
             <ros2_control name="fake_ovis_control" type="system">
                 <hardware>
                     <plugin>mock_components/GenericSystem</plugin>
+                    <param name="calculate_dynamics">true</param>
                 </hardware>
                 <xacro:ovis_fake_actuator_control prefix="${prefix}" suffix="1"/>
                 <xacro:ovis_fake_actuator_control prefix="${prefix}" suffix="2"/>

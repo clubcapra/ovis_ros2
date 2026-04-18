@@ -24,6 +24,7 @@ setup(
     },
     entry_points={
         'console_scripts': [
+            "ovis_ik = ovis_servo.ovis_ik:main"
         ],
     },
 )

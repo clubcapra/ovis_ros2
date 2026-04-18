@@ -13,7 +13,8 @@ Subscribed:
   /ovis/cmd_cartesian_vel    (geometry_msgs/TwistStamped) — desired EE velocity
 
 Published:
-  /ovis/joint_velocity_cmd   (std_msgs/Float64MultiArray) — [j1 .. j6] rad/s
+  /ovis_controller/commands  (std_msgs/Float64MultiArray) — [j1..j6] rad/s,
+                               order matches ForwardCommandController joints list
 
 Parameters
 ----------
@@ -59,6 +60,12 @@ class OvisVelocityIK(Node):
         self.declare_parameter("max_joint_vel", 1.0)
         self.declare_parameter("cmd_timeout",   0.5)
         self.declare_parameter("publish_rate",  100.0)
+        # Must match the joints: list in the ForwardCommandController config,
+        # in the same order — this defines the output array ordering.
+        self.declare_parameter("controller_joints", [
+            "ovis_joint_1", "ovis_joint_2", "ovis_joint_3",
+            "ovis_joint_4", "ovis_joint_5", "ovis_joint_6",
+        ])
 
         self.prefix       = self.get_parameter("prefix").value
         self.ee_frame_name = self.get_parameter("end_effector").value
@@ -67,6 +74,8 @@ class OvisVelocityIK(Node):
         self.max_vel      = self.get_parameter("max_joint_vel").value
         self.cmd_timeout  = self.get_parameter("cmd_timeout").value
         rate_hz           = self.get_parameter("publish_rate").value
+        # Output order must match the ForwardCommandController joints: list exactly
+        self.controller_joints = self.get_parameter("controller_joints").value
 
         # ── Internal state ────────────────────────────────────────────────────
         self._lock          = threading.Lock()
@@ -100,7 +109,7 @@ class OvisVelocityIK(Node):
 
         # ── Publisher ─────────────────────────────────────────────────────────
         self._vel_pub = self.create_publisher(
-            Float64MultiArray, "/ovis/joint_velocity_cmd", 10)
+            Float64MultiArray, "/ovis_controller/commands", 10)
 
         # ── Control loop timer ────────────────────────────────────────────────
         period = 1.0 / rate_hz
@@ -217,10 +226,13 @@ class OvisVelocityIK(Node):
         pin.forwardKinematics(model, data, q)
         pin.updateFramePlacements(model, data)
 
-        # 6×nv Jacobian in LOCAL_WORLD_ALIGNED frame (expresses EE vel in world)
+        # 6×nv Jacobian in LOCAL frame — velocity commands are interpreted in the
+        # end-effector frame, so "forward" always means along the tool axis
+        # regardless of the arm's current configuration.
+        # Switch to LOCAL_WORLD_ALIGNED if you ever want world-frame commands.
         J = pin.computeFrameJacobian(
             model, data, q, frame_id,
-            pin.ReferenceFrame.LOCAL_WORLD_ALIGNED
+            pin.ReferenceFrame.LOCAL
         )
 
         # ── Damped Least Squares inverse ──────────────────────────────────────
@@ -229,11 +241,12 @@ class OvisVelocityIK(Node):
         A    = J @ J.T + lam2 * np.eye(6)
         qdot_full = J.T @ np.linalg.solve(A, cart_vel)
 
-        # ── Extract the 6 actuated joint velocities in name order ─────────────
-        joint_vels = np.zeros(6)
-        for out_idx, name in enumerate(self._joint_names):
-            jid   = model.getJointId(name)
-            vidx  = model.joints[jid].idx_v
+        # ── Extract velocities in ForwardCommandController order ──────────────
+        # controller_joints defines the exact array order the controller expects.
+        joint_vels = np.zeros(len(self.controller_joints))
+        for out_idx, name in enumerate(self.controller_joints):
+            jid  = model.getJointId(name)
+            vidx = model.joints[jid].idx_v
             joint_vels[out_idx] = qdot_full[vidx]
 
         # ── Clamp ─────────────────────────────────────────────────────────────
@@ -246,7 +259,7 @@ class OvisVelocityIK(Node):
 
     def _publish_zeros(self):
         out = Float64MultiArray()
-        out.data = [0.0] * 6
+        out.data = [0.0] * len(self.controller_joints)
         self._vel_pub.publish(out)
 
 
