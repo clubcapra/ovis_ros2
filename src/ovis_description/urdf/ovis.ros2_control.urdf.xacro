@@ -26,11 +26,9 @@
                 <hardware>
                     <plugin>ovis_control/OvisHWInterface</plugin>
                     <param name="api_type">ETHERNET</param>
-                    <param name="local_machine_IP">192.168.84.123</param>
+                    <param name="local_machine_IP">192.168.2.123</param>
                     <param name="subnet_mask">255.255.255.0</param>
-                    <param name="robot_ip_address">192.168.84.160</param>
-                    <param name="robot_ip_address">192.168.84.160</param>
-                    <param name="robot_ip_address">192.168.84.160</param>
+                    <param name="robot_ip_address">192.168.2.50</param>
                 </hardware>
                 <xacro:ovis_actuator_control prefix="${prefix}" suffix="1"/>
                 <xacro:ovis_actuator_control prefix="${prefix}" suffix="2"/>

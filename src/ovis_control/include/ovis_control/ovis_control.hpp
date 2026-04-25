@@ -84,7 +84,7 @@ private:
 
   std::vector<double> hw_position_commands_;
   std::vector<double> hw_position_states_;
-  std::vector<double> hw_position_init_{201.972, 86.3965, 4.47725, 150.82, 181.582, 0};
+  std::vector<double> hw_position_init_{90.0, 181.0, -178.712, 167.3005, -178.0, -60.5317};
   std::vector<double> hw_position_invert_{-1, -1, -1, -1, -1, -1};
   std::vector<double> hw_velocity_commands_;
   std::vector<double> hw_velocity_states_;

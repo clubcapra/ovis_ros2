@@ -83,7 +83,7 @@ KinovaComm::KinovaComm(boost::recursive_mutex& api_mutex,
     if (info.hardware_parameters.find("local_broadcast_port") != info.hardware_parameters.end())
         local_bcast_port = stoi(info.hardware_parameters.at("local_broadcast_port"));
 
-    std::string robot_ip_address = "192.168.84.160";
+    std::string robot_ip_address = "192.168.2.50";
     if (info.hardware_parameters.find("robot_ip_address") != info.hardware_parameters.end())
         robot_ip_address = info.hardware_parameters.at("robot_ip_address");
 
@@ -192,7 +192,7 @@ KinovaComm::KinovaComm(boost::recursive_mutex& api_mutex,
     // num_joints_ = kinova_robotType[3]-'0';
     // num_fingers_ = kinova_robotType[5]-'0';
     num_joints_ = 6;
-    num_joints_ = 2;
+    // num_joints_ = 2;
 
     // On a cold boot the arm may not respond to commands from the API right away.
     // This kick-starts the Control API so that it's ready to go.

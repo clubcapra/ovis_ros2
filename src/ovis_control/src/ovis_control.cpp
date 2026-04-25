@@ -178,7 +178,7 @@ TEMPLATES__ROS2_CONTROL__VISIBILITY_PUBLIC std::vector<hardware_interface::State
         catch (const kinova::KinovaCommException &e)
         {
             RCLCPP_ERROR(rclcpp::get_logger(get_name()), e.what());
-            return hardware_interface::return_type::ERROR;
+            // return hardware_interface::return_type::ERROR;
         }
         return hardware_interface::return_type::OK;
     }
@@ -225,7 +225,7 @@ TEMPLATES__ROS2_CONTROL__VISIBILITY_PUBLIC std::vector<hardware_interface::State
         catch (const kinova::KinovaCommException &e)
         {
             RCLCPP_ERROR(logger(), e.what());
-            return hardware_interface::return_type::ERROR;
+            // return hardware_interface::return_type::ERROR;
         }
 
         return hardware_interface::return_type::OK;

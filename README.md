@@ -43,3 +43,19 @@ Before pushing your code, you should try to deploy it by using:
 ```bash
 docker compose build --build-arg USER_UID=$(id -u) --build-arg USER_GID=$(id -g) --build-arg USERNAME=$(id -un)
 ```
+## Ovis IK package (native)
+
+This repository now includes `src/ovis_ik` (`ament_python`) to run differential IK nodes natively.
+
+```bash
+ros2 run ovis_ik velocity_node
+ros2 run ovis_ik constant_vel_publisher
+ros2 run ovis_ik fk_simulation_node
+ros2 run ovis_ik ovis_viz_node
+```
+
+`ovis_ik` depends on Peter Corke's Robotics Toolbox, which is installed with pip:
+
+```bash
+python3 -m pip install roboticstoolbox-python
+```
